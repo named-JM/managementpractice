@@ -87,6 +87,7 @@ $result = $stmt->get_result();
         <br><br>
         <input type="submit" value="Submit">
     </form>
+    <a href="benefits.php">Back to benefits</a>
 
     <h2>Benefits List for ben_id: <?php echo $ben_id; ?></h2>
     <table border="1">
@@ -106,5 +107,6 @@ $result = $stmt->get_result();
         </tr>
         <?php endwhile; ?>
     </table>
+
 </body>
 </html>
