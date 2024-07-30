@@ -20,11 +20,10 @@ $result = $conn->query($sql);
     <table border="1">
         <thead>
             <tr>
-                <!-- <th>ID</th> -->
+                <th>Contractual Name</th>
                 <th>Compensation Type</th>
                 <th>Terms</th>
                 <th>Duration</th>
-                <!-- <th>Status</th> -->
             </tr>
         </thead>
         <tbody>
@@ -32,15 +31,14 @@ $result = $conn->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    // echo "<td>" . $row["employ_id"] . "</td>";
+                    echo "<td>" . $row["contractual_name"] . "</td>";
                     echo "<td>" . $row["employ_compensation"] . "</td>";
                     echo "<td>" . $row["employ_terms"] . "</td>";
                     echo "<td>" . $row["employ_duration"] . "</td>";
-                    // echo "<td>" . ($row["employ_status"] == 0 ? "Good" : "Deleted") . "</td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='5'>No records found</td></tr>";
+                echo "<tr><td colspan='4'>No records found</td></tr>";
             }
             ?>
         </tbody>

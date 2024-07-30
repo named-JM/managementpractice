@@ -3,23 +3,53 @@ include "db_connection.php";
 
 $ben_id = $_GET['ben_id'] ?? '';
 
+// Function to check for overlapping ranges
+function isRangeOverlap($conn, $ben_id, $start, $end) {
+    $stmt = $conn->prepare("SELECT * FROM benefits_lists WHERE ben_id = ? AND ((ben_list_range_s <= ? AND ben_list_range_e >= ?) OR (ben_list_range_s <= ? AND ben_list_range_e >= ?))");
+    $stmt->bind_param("idddd", $ben_id, $end, $end, $start, $start);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+    return $result->num_rows > 0;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ben_list_range_s = $_POST['ben_list_range_s'] ?? '';
     $ben_list_range_e = $_POST['ben_list_range_e'] ?? '';
     $ben_employee_amount = $_POST['ben_employee_amount'] ?? '';
     $ben_employer_amount = $_POST['ben_employer_amount'] ?? '';
-    $ben_list_status = $_POST['ben_list_status'] ?? '';
 
-    if (!empty($ben_list_range_s) && !empty($ben_list_range_e) && !empty($ben_employee_amount) && !empty($ben_employer_amount) && !empty($ben_list_status)) {
-        $stmt = $conn->prepare("INSERT INTO benefits_lists (ben_id, ben_list_range_s, ben_list_range_e, ben_employee_amount, ben_employer_amount, ben_list_status) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("idddds", $ben_id, $ben_list_range_s, $ben_list_range_e, $ben_employee_amount, $ben_employer_amount, $ben_list_status);
+    // Debugging information
+    echo "<br>ben_id: $ben_id<br>";
+    echo "ben_list_range_s: $ben_list_range_s<br>";
+    echo "ben_list_range_e: $ben_list_range_e<br>";
+    echo "ben_employee_amount: $ben_employee_amount<br>";
+    echo "ben_employer_amount: $ben_employer_amount<br>";
 
-        if ($stmt->execute()) {
-            echo "New benefits list entry added successfully.";
+    if (!empty($ben_list_range_s) && !empty($ben_list_range_e) && !empty($ben_employee_amount) && !empty($ben_employer_amount)) {
+        if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e)) {
+            echo "Error: The range overlaps with an existing range.";
         } else {
-            echo "Error: " . $stmt->error;
+            // Debugging statement to check if ben_id exists in benefits table
+            $stmt_check = $conn->prepare("SELECT ben_id FROM benefits WHERE ben_id = ?");
+            $stmt_check->bind_param("i", $ben_id);
+            $stmt_check->execute();
+            $result_check = $stmt_check->get_result();
+            if ($result_check->num_rows == 0) {
+                echo "Error: ben_id does not exist in benefits table.";
+            } else {
+                $stmt = $conn->prepare("INSERT INTO benefits_lists (ben_id, ben_list_range_s, ben_list_range_e, ben_employee_amount, ben_employer_amount) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("idddd", $ben_id, $ben_list_range_s, $ben_list_range_e, $ben_employee_amount, $ben_employer_amount);
+
+                if ($stmt->execute()) {
+                    echo "New benefits list entry added successfully.";
+                } else {
+                    echo "Error: " . $stmt->error;
+                }
+                $stmt->close();
+            }
+            $stmt_check->close();
         }
-        $stmt->close();
     } else {
         echo "All fields are required.";
     }
@@ -55,54 +85,26 @@ $result = $stmt->get_result();
         <label for="ben_employer_amount">Employer Amount:</label>
         <input type="number" id="ben_employer_amount" name="ben_employer_amount" step="0.01">
         <br><br>
-        <label for="ben_list_status">Status:</label>
-        <select id="ben_list_status" name="ben_list_status">
-            <option value="">Select Status</option>
-            <option value="active">Active</option>
-            <option value="on hold">On Hold</option>
-            <option value="pending">Pending</option>
-        </select>
-        <br><br>
-        <input type="submit" value="Add to List">
+        <input type="submit" value="Submit">
     </form>
 
-    <h2>Benefits List Records</h2>
+    <h2>Benefits List for ben_id: <?php echo $ben_id; ?></h2>
     <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Range Start</th>
-                <th>Range End</th>
-                <th>Employee Amount</th>
-                <th>Employer Amount</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>";
-                    echo "<td>" . $row["ben_list_id"] . "</td>";
-                    echo "<td>" . $row["ben_list_range_s"] . "</td>";
-                    echo "<td>" . $row["ben_list_range_e"] . "</td>";
-                    echo "<td>" . $row["ben_employee_amount"] . "</td>";
-                    echo "<td>" . $row["ben_employer_amount"] . "</td>";
-                    echo "<td>" . $row["ben_list_status"] . "</td>";
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='6'>No records found</td></tr>";
-            }
-            ?>
-        </tbody>
+        <tr>
+            <th>Range Start</th>
+            <th>Range End</th>
+            <th>Employee Amount</th>
+            <th>Employer Amount</th>
+        </tr>
+        <?php while ($row = $result->fetch_assoc()): ?>
+        <tr>
+    
+            <td><?php echo $row['ben_list_range_s']; ?></td>
+            <td><?php echo $row['ben_list_range_e']; ?></td>
+            <td><?php echo $row['ben_employee_amount']; ?></td>
+            <td><?php echo $row['ben_employer_amount']; ?></td>
+        </tr>
+        <?php endwhile; ?>
     </table>
-
-    <br><br>
-    <a href="benefits.php">Back to Benefits</a>
 </body>
 </html>
-
-<?php
-$conn->close();
-?>

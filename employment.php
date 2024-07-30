@@ -5,14 +5,14 @@ $successMessage = "";
 $errorMessage = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $contractual_name = $_POST['contractual_name'] ?? '';
     $compensation = $_POST['compensation'] ?? '';
     $terms = $_POST['terms'] ?? '';
     $duration = $_POST['duration'] ?? '';
 
-
-    if (!empty($compensation) && !empty($terms) && !empty($duration)) {
-        $stmt = $conn->prepare("INSERT INTO employment (employ_compensation, employ_terms, employ_duration, employ_status) VALUES (?, ?, ?, 0)");
-        $stmt->bind_param("sss", $compensation, $terms, $duration);
+    if (!empty($contractual_name) && !empty($compensation) && !empty($terms) && !empty($duration)) {
+        $stmt = $conn->prepare("INSERT INTO employment (contractual_name, employ_compensation, employ_terms, employ_duration, employ_status) VALUES (?, ?, ?, ?, 0)");
+        $stmt->bind_param("ssss", $contractual_name, $compensation, $terms, $duration);
 
         if ($stmt->execute()) {
             $successMessage = "New record created successfully.";
@@ -36,9 +36,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <h1>Employment Contract Form</h1>
     <form action="employment.php" method="post">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name">
+        <label for="contractual_name">Contractual Name:</label>
+        <input type="text" id="contractual_name" name="contractual_name">
+
         <br><br>
+
         <label for="compensation">Compensation Type:</label>
         <select id="compensation" name="compensation">
             <option value="">Select Compensation</option>
