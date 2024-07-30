@@ -36,6 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <h1>Employment Contract Form</h1>
     <form action="employment.php" method="post">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name">
+        <br><br>
         <label for="compensation">Compensation Type:</label>
         <select id="compensation" name="compensation">
             <option value="">Select Compensation</option>

@@ -54,7 +54,7 @@ $result = $conn->query($sql);
     <table border="1">
         <thead>
             <tr>
-                <th>ID</th>
+                <!-- <th>ID</th> -->
                 <th>Name</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -65,10 +65,10 @@ $result = $conn->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row["ben_id"] . "</td>";
+                    // echo "<td>" . $row["ben_id"] . "</td>";
                     echo "<td>" . $row["ben_name"] . "</td>";
                     echo "<td>" . $row["ben_status"] . "</td>";
-                    echo "<td><a href=>View List</a></td>";
+                    echo "<td><a href='benefits_list.php'>View List</a></td>";
                     echo "</tr>";
                 }
             } else {
