@@ -1,7 +1,22 @@
 <?php
 include "../db_connection.php";
 
-// Update benefit status
+// Handle add new benefit
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_benefit'])) {
+    $ben_name = $_POST['ben_name'];
+
+    $stmt = $conn->prepare("INSERT INTO benefits (ben_name, ben_status) VALUES (?, 'active')");
+    $stmt->bind_param("s", $ben_name);
+
+    if ($stmt->execute()) {
+        echo "Benefit added successfully.";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+    $stmt->close();
+}
+
+// UPDATE STATUS
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_status'])) {
     $ben_id = $_POST['ben_id'];
     $ben_status = $_POST['ben_status'];
@@ -53,12 +68,16 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
+    <br><br>
+    <a href="../employment.php">Back to Employment</a>
+
+    <!-- BENEFITS FORM -->
     <h1>Benefits</h1>
     <form action="benefits.php" method="post">
         <label for="ben_name">Benefit Name:</label>
         <input type="text" id="ben_name" name="ben_name">
         <br><br>
-        <input type="submit" value="Add Benefit">
+        <input type="submit" name="add_benefit" value="Add Benefit">
     </form>
 
     <h2>Benefits List</h2>
@@ -78,7 +97,7 @@ $result = $conn->query($sql);
                     echo "<td>" . $row["ben_name"] . "</td>";
                     echo "<td>" . $row["ben_status"] . "</td>";
                     echo "<td>
-                    <button onclick='openPopup(" . $row["ben_id"] . ")'>Edit Status</button>
+                    <button type='button' onclick='openPopup(" . $row["ben_id"] . ")'>Edit Status</button>
                     <a href='benefits_list.php?ben_id=" . $row["ben_id"] . "'>View List</a>
                     </td>";
                     echo "</tr>";
@@ -89,7 +108,7 @@ $result = $conn->query($sql);
             ?>
         </tbody>
     </table>
-    <a href="../employment.php">back to employment</a>
+    
 
     <!-- Popup Overlay -->
     <div id="popup-overlay" class="popup-overlay"></div>
