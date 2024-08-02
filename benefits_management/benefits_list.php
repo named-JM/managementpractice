@@ -3,7 +3,7 @@ include "../db_connection.php";
 
 $ben_id = $_GET['ben_id'] ?? '';
 
-// Function to check for overlapping ranges
+// CHECKING FOR OVERLAPPING IN THE DATA TABLE RANGES!!!
 function isRangeOverlap($conn, $ben_id, $start, $end) {
     $stmt = $conn->prepare("SELECT * FROM benefits_lists WHERE ben_id = ? AND ((ben_list_range_s <= ? AND ben_list_range_e >= ?) OR (ben_list_range_s <= ? AND ben_list_range_e >= ?))");
     $stmt->bind_param("idddd", $ben_id, $end, $end, $start, $start);
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ben_employee_amount = $_POST['ben_employee_amount'] ?? '';
     $ben_employer_amount = $_POST['ben_employer_amount'] ?? '';
 
-    // Debugging information
+    // JUST A DISPLAYING
     echo "<br>ben_id: $ben_id<br>";
     echo "ben_list_range_s: $ben_list_range_s<br>";
     echo "ben_list_range_e: $ben_list_range_e<br>";
@@ -30,14 +30,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e)) {
             echo "Error: The range overlaps with an existing range.";
         } else {
-            // Debugging statement to check if ben_id exists in benefits table
+            //CHECKING IF BEN ID EXIST IN THE TABLE
             $stmt_check = $conn->prepare("SELECT ben_id FROM benefits WHERE ben_id = ?");
             $stmt_check->bind_param("i", $ben_id);
             $stmt_check->execute();
             $result_check = $stmt_check->get_result();
+            // INSERTING
             if ($result_check->num_rows == 0) {
                 echo "Error: ben_id does not exist in benefits table.";
             } else {
+                // INSERTING/ADDING BENEFITS LIST
                 $stmt = $conn->prepare("INSERT INTO benefits_lists (ben_id, ben_list_range_s, ben_list_range_e, ben_employee_amount, ben_employer_amount) VALUES (?, ?, ?, ?, ?)");
                 $stmt->bind_param("idddd", $ben_id, $ben_list_range_s, $ben_list_range_e, $ben_employee_amount, $ben_employer_amount);
 
@@ -71,7 +73,11 @@ $result = $stmt->get_result();
     <title>Benefits List</title>
 </head>
 <body>
+    <br><br>
+    <!-- NAVIGATION PAGE LINKS -->
+    <a href="benefits.php">Back to benefits</a>
     <h1>Benefits List</h1>
+
     <form action="benefits_list.php?ben_id=<?php echo $ben_id; ?>" method="post">
         <label for="ben_list_range_s">Range Start:</label>
         <input type="number" id="ben_list_range_s" name="ben_list_range_s" step="0.01">
@@ -88,8 +94,7 @@ $result = $stmt->get_result();
         <input type="submit" value="Submit">
     </form>
 
-    <!-- NAVIGATION PAGE LINKS -->
-    <a href="benefits.php">Back to benefits</a>
+    
 
     <h2>Benefits List for ben_id: <?php echo $ben_id; ?></h2>
     <table border="1">
