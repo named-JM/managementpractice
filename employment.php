@@ -82,7 +82,7 @@ $result = $conn->query("SELECT * FROM employment");
     <?php endif; ?>
 
     <!-- PAGES NAVIGATION LINK-->
-    <a href="benefits.php">Benefits Management</a><br>
+    <a href="benefits_management/benefits.php">Benefits Management</a><br>
     <a href="position_management/position.php">Position Management</a>
 
 

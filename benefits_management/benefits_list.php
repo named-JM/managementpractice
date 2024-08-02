@@ -1,5 +1,5 @@
 <?php
-include "db_connection.php";
+include "../db_connection.php";
 
 $ben_id = $_GET['ben_id'] ?? '';
 
@@ -87,6 +87,8 @@ $result = $stmt->get_result();
         <br><br>
         <input type="submit" value="Submit">
     </form>
+
+    <!-- NAVIGATION PAGE LINKS -->
     <a href="benefits.php">Back to benefits</a>
 
     <h2>Benefits List for ben_id: <?php echo $ben_id; ?></h2>

@@ -1,5 +1,5 @@
 <?php
-include "db_connection.php";
+include "../db_connection.php";
 
 // Update benefit status
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_status'])) {
@@ -89,7 +89,7 @@ $result = $conn->query($sql);
             ?>
         </tbody>
     </table>
-    <a href="employment.php">back to employment</a>
+    <a href="../employment.php">back to employment</a>
 
     <!-- Popup Overlay -->
     <div id="popup-overlay" class="popup-overlay"></div>
