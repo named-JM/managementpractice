@@ -24,6 +24,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errorMessage = "All fields are required.";
     }
 }
+
+// Fetch all records from the employment table
+$result = $conn->query("SELECT * FROM employment");
 ?>
 
 <!DOCTYPE html>
@@ -34,13 +37,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Employment Contract Form</title>
 </head>
 <body>
+    <!-- EMPLOYMENT FORM STARTS HERE!!!! -->
     <h1>Employment Contract Form</h1>
     <form action="employment.php" method="post">
+        <!-- CONTRACT NAME -->
         <label for="contractual_name">Contractual Name:</label>
         <input type="text" id="contractual_name" name="contractual_name">
-
         <br><br>
-
+        <!-- COMPENSATION FORM DROPDOWN -->
         <label for="compensation">Compensation Type:</label>
         <select id="compensation" name="compensation">
             <option value="">Select Compensation</option>
@@ -49,10 +53,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <option value="per day">Per Day</option>
             <option value="project-based">Project-Based</option>
             <option value="commission-based">Commission Based</option>
+            <option value="piece worker">Piece Worker</option>
         </select>
 
         <br><br>
-
+        <!-- TERMS DROPDOWN TIME/DAY -->
         <label for="terms">Terms:</label>
         <select id="terms" name="terms">
             <option value="">Select Term</option>
@@ -61,26 +66,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </select>
 
         <br><br>
-
+        <!-- DURATION INPUT NUMBER!!!! -->
         <label id="durationLabel" for="duration">Duration:</label>
         <input type="number" id="duration" name="duration">
 
         <br><br>
-
+        <!-- SUBMIT -->
         <input type="submit" value="Submit">
     </form>
-
-    <br>
-
+    <!-- JUST A PROMPT FOR SUCCESS ADDING -->
     <?php if ($successMessage): ?>
         <p><?php echo $successMessage; ?></p>
     <?php elseif ($errorMessage): ?>
         <p><?php echo $errorMessage; ?></p>
     <?php endif; ?>
 
-    <br>
-    <a href="display.php">View Records</a>
-    <a href="benefits.php">Benefits</a>
+    <!-- PAGES NAVIGATION LINK-->
+    <a href="benefits.php">Benefits Management</a><br>
+    <a href="position_management/position.php">Position Management</a>
+
+
+    <!-- HERES THE DISPLAY TABLE!!! -->
+    <h2>Table</h2>
+    <table border="1">
+        <tr>
+            <th>Contractual Name</th>
+            <th>Compensation Type</th>
+            <th>Terms</th>
+            <th>Duration</th>
+        </tr>
+        <!-- KINUKUHA SA DATABASE NA NA-ADD -->
+        <?php while($row = $result->fetch_assoc()): ?>
+            <tr>
+                <td><?php echo $row['contractual_name']; ?></td>
+                <td><?php echo $row['employ_compensation']; ?></td>
+                <td><?php echo $row['employ_terms']; ?></td>
+                <td>
+                <!-- CONDITION FOR TIME = HOURS DISPLAY AND DAY = DAYS DISPLAY -->
+                <?php
+                if($row['employ_terms'] == 'Time'){
+                    echo $row['employ_duration'] . " hrs";
+                } elseif($row['employ_terms'] == 'Day') {
+                    echo $row['employ_duration'] . " days";
+                }
+                else {
+                    echo "No data ";
+                }
+                ?></td>
+
+            </tr>
+        <?php endwhile; ?>
+    </table>
 
 </body>
 </html>
