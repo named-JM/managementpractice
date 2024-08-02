@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fetch all records from the employment table
+//FETCHING ALL RECORD FROM THE EPMOLYMENT DATATABLE THAST HAS BEEN ADDEDED
 $result = $conn->query("SELECT * FROM employment");
 ?>
 
@@ -39,6 +39,10 @@ $result = $conn->query("SELECT * FROM employment");
 <body>
     <!-- EMPLOYMENT FORM STARTS HERE!!!! -->
     <h1>Employment Contract Form</h1>
+    <!-- PAGES NAVIGATION LINK-->
+    <a href="benefits_management/benefits.php">Benefits Management</a>
+    <a href="position_management/position.php">Position Management</a>
+<BR><br>
     <form action="employment.php" method="post">
         <!-- CONTRACT NAME -->
         <label for="contractual_name">Contractual Name:</label>
@@ -80,10 +84,6 @@ $result = $conn->query("SELECT * FROM employment");
     <?php elseif ($errorMessage): ?>
         <p><?php echo $errorMessage; ?></p>
     <?php endif; ?>
-
-    <!-- PAGES NAVIGATION LINK-->
-    <a href="benefits_management/benefits.php">Benefits Management</a><br>
-    <a href="position_management/position.php">Position Management</a>
 
 
     <!-- HERES THE DISPLAY TABLE!!! -->
