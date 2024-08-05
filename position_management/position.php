@@ -8,9 +8,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $pos_salary = $_POST['pos_salary'];
     $pos_status = "active";
 
+
+    $pos_date = date('Y-m-d H:i:s'); // Correct format for MySQL
+
     // Insert data into the position table
-    $stmt = $conn->prepare("INSERT INTO position (pos_name, pos_employment, pos_salary, pos_status) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("sids", $pos_name, $pos_employment, $pos_salary, $pos_status);
+    $stmt = $conn->prepare("INSERT INTO position (pos_name, pos_employment, pos_salary, pos_status, pos_date) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sidss", $pos_name, $pos_employment, $pos_salary, $pos_status, $pos_date);
     if ($stmt->execute()) {
         $pos_id = $stmt->insert_id;
 
@@ -18,10 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $benefits = $_POST['pos_ref'] ?? [];
 
         // Insert each benefit into the position_benefits table
-        $stmt = $conn->prepare("INSERT INTO position_benefits (pos_ref, ben_id) VALUES (?, ?)");
+        $stmt = $conn->prepare("INSERT INTO position_benefits (pos_ref, ben_id, pos_date) VALUES (?, ?, ?)");
         foreach ($benefits as $ben_id) {
-            if (!empty($ben_id)) { // Skip empty values
-                $stmt->bind_param("ii", $pos_id, $ben_id);
+            if (!empty($ben_id)) { 
+                $stmt->bind_param("iis", $pos_id, $ben_id, $pos_date);
                 $stmt->execute();
             }
         }
@@ -39,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $contracts = $conn->query("SELECT employ_id, contractual_name FROM employment");
 $benefits = $conn->query("SELECT ben_id, ben_name FROM benefits");
 $result = $conn->query("SELECT * FROM position");
-
 
 // WHERE BENEFITS DROPWDOWN IT WILL DISPLAY THE NAME OF IT AND VALUE OF ITS ID
 $benefitOptions = "";
@@ -125,6 +127,7 @@ if ($benefits->num_rows > 0) {
             <th>Position Name</th>
             <th>Contract</th>
             <th>Salary</th>
+            <th>Date Added</th> <!-- Added column -->
         </tr>
         <!-- KINUKUHA SA DATABASE NA NA-ADD -->
         <?php while($row = $result->fetch_assoc()): ?>
@@ -132,6 +135,8 @@ if ($benefits->num_rows > 0) {
                 <td><?php echo $row['pos_name']; ?></td>
                 <td><?php echo $row['pos_employment']; ?></td>
                 <td><?php echo $row['pos_salary']; ?></td>
+                <!-- FORMAT MONTH DATE YEAR -->
+                <td><?php echo date('m-d-Y H:i:s', strtotime($row['pos_date'])); ?></td>
             </tr>
         <?php endwhile; ?>
     </table>
