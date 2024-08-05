@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // FETCHING DATA IN EMPLOYMENT TABLE, BENEFITS TABLE, POSITION TABLE
-$contracts = $conn->query("SELECT employ_id, contractual_name FROM employment");
+$contracts = $conn->query("SELECT employ_id, contractual_name, employ_compensation, employ_terms FROM employment");
 $benefits = $conn->query("SELECT ben_id, ben_name FROM benefits");
 $result = $conn->query("SELECT * FROM position");
 
@@ -89,7 +89,7 @@ if ($benefits->num_rows > 0) {
             <?php
             if ($contracts->num_rows > 0) {
                 while ($contract = $contracts->fetch_assoc()) {
-                    echo "<option value='" . $contract['employ_id'] ."'>" . $contract['contractual_name']. "</option>";
+                    echo "<option value='" . $contract['employ_id'] ."'>" . $contract['contractual_name']. " - " . $contract['employ_compensation']. " - ". $contract['employ_terms']. "</option>";
                 }
             } else {
                 echo "<option value=''>No contracts available</option>";
