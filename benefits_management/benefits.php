@@ -1,7 +1,7 @@
 <?php
 include "../db_connection.php";
 
-// Handle add new benefit
+// ADD NEW BENEFIT
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_benefit'])) {
     $ben_name = $_POST['ben_name'];
 
