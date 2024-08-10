@@ -42,6 +42,7 @@ $result = $conn->query("SELECT * FROM employment");
     <!-- PAGES NAVIGATION LINK-->
     <a href="benefits_management/benefits.php">Benefits Management</a>
     <a href="position_management/position.php">Position Management</a>
+    <a href="employee_management/add_employee.php">Employee Management</a>
 <BR><br>
     <form action="employment.php" method="post">
         <!-- CONTRACT NAME -->
