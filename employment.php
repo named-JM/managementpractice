@@ -75,6 +75,7 @@ $result = $conn->query("SELECT * FROM employment");
             display: block;
             margin-bottom: 5px;
         }
+        
         span.ripple {
         position: absolute;
         border-radius: 50%;
@@ -96,9 +97,34 @@ $result = $conn->query("SELECT * FROM employment");
 
     <!-- BUTTON TO OPEN THE FORM IN SWEETALERT -->
     <!-- <button id="openFormBtn" class="text-white bg-gradient-to-br from-pink-500 to-amber-500 hover:bg-gradient-to-bl bg-black focus:ring-4 focus:outline-none
-    focus:ring-pink-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Open Form</button> -->
+    focus:ring-pink-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Open Form</button>
 
+    <button class="
+        group
+        p-2
+        cursor-pointer 
+        relative  
+        text-sm
+        font-normal 
+        border-0 
+        flex 
+        items-center 
+        justify-center
+        bg-transparent
+         text-red-500 
+         h-auto  
+         w-[200px]  
+         overflow-hidden   
+         transition-all
+         duration-100">
+        <span class="group-hover:w-full absolute left-0 h-full w-5 border-y border-l border-red-500 transition-all duration-500"></span>
 
+        <p class="">ADD COMPENSATION</p>
+        <span
+            class="group-hover:w-full absolute right-0 h-full w-5  border-y border-r  border-red-500 transition-all duration-500">
+        </span>
+        </button> -->
+<br><br>
     <button type="button" id="openFormBtn"
         class="rounded px-5 py-3 min-w-max overflow-hidden shadow relative bg-indigo-500 text-white hover:bg-opacity-90">
         Add Employee Contract
