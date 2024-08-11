@@ -20,11 +20,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ben_employer_amount = $_POST['ben_employer_amount'] ?? '';
 
     // JUST A DISPLAYING
-    echo "<br>ben_id: $ben_id<br>";
-    echo "ben_list_range_s: $ben_list_range_s<br>";
-    echo "ben_list_range_e: $ben_list_range_e<br>";
-    echo "ben_employee_amount: $ben_employee_amount<br>";
-    echo "ben_employer_amount: $ben_employer_amount<br>";
+    // echo "<br>ben_id: $ben_id<br>";
+    // echo "ben_list_range_s: $ben_list_range_s<br>";
+    // echo "ben_list_range_e: $ben_list_range_e<br>";
+    // echo "ben_employee_amount: $ben_employee_amount<br>";
+    // echo "ben_employer_amount: $ben_employer_amount<br>";
 
     if (!empty($ben_list_range_s) && !empty($ben_list_range_e) && !empty($ben_employee_amount) && !empty($ben_employer_amount)) {
         if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e)) {
@@ -81,21 +81,51 @@ $result = $stmt->get_result();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- SWEETALERT2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- As an old-school alternative, you can initialize the plugin by referencing the necessary files: -->
-    <script src="sweetalert2.all.min.js"></script>
-    <!-- Or with the stylesheet separately if desired: -->
-    <script src="sweetalert2.min.js"></script>
-    <link rel="stylesheet" href="sweetalert2.min.css">
+   
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables JS CDN -->
     <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
     <!-- DataTables Initialization Script -->
     <script>
-        $(document).ready( function () {
-            $('#benefits_table').DataTable();
+    $(document).ready(function () {
+        $('#benefits_table').DataTable();
+
+        $('#openFormBtn').on('click', function () {
+            Swal.fire({
+                title: 'Benefits Form',
+                html: `
+                    <form id="benefitsForm" action="benefits_list.php?ben_id=${encodeURIComponent(<?php echo $ben_id; ?>)}" method="post">
+                        <label for="ben_list_range_s">Range Start:</label>
+                        <input type="number" id="ben_list_range_s" name="ben_list_range_s" step="0.01" required>
+                        <br><br>
+                        <label for="ben_list_range_e">Range End:</label>
+                        <input type="number" id="ben_list_range_e" name="ben_list_range_e" step="0.01" required>
+                        <br><br>
+                        <label for="ben_employee_amount">Employee Amount:</label>
+                        <input type="number" id="ben_employee_amount" name="ben_employee_amount" step="0.01" required>
+                        <br><br>
+                        <label for="ben_employer_amount">Employer Amount:</label>
+                        <input type="number" id="ben_employer_amount" name="ben_employer_amount" step="0.01" required>
+                        <br><br>
+                    </form>
+                `,
+                showCancelButton: true,
+                cancelButtonColor: "#d33",
+                confirmButtonText: 'Submit',
+                width: '400px',
+                customClass: {
+                    popup: 'swal-wide', // Additional custom class if needed
+                },
+                preConfirm: () => {
+                    // Validate form data here if needed
+                    document.getElementById('benefitsForm').submit();
+                }
+            });
         });
-    </script>
+    });
+</script>
+
 </head>
 <body class="bg-gray-100 p-20 m-2">
     <br><br>
@@ -103,21 +133,11 @@ $result = $stmt->get_result();
     <a href="benefits.php">Back to benefits</a>
     <h1>Benefits List</h1>
 
-    <form action="benefits_list.php?ben_id=<?php echo $ben_id; ?>" method="post">
-        <label for="ben_list_range_s">Range Start:</label>
-        <input type="number" id="ben_list_range_s" name="ben_list_range_s" step="0.01">
-        <br><br>
-        <label for="ben_list_range_e">Range End:</label>
-        <input type="number" id="ben_list_range_e" name="ben_list_range_e" step="0.01">
-        <br><br>
-        <label for="ben_employee_amount">Employee Amount:</label>
-        <input type="number" id="ben_employee_amount" name="ben_employee_amount" step="0.01">
-        <br><br>
-        <label for="ben_employer_amount">Employer Amount:</label>
-        <input type="number" id="ben_employer_amount" name="ben_employer_amount" step="0.01">
-        <br><br>
-        <input type="submit" value="Submit">
-    </form>
+    <button type="button" id="openFormBtn"
+        class="rounded px-5 py-3 min-w-max overflow-hidden shadow relative bg-indigo-500 text-white hover:bg-opacity-90">
+        Add Benefits Range
+    </button>
+    
 
     
 
