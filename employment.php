@@ -1,6 +1,8 @@
 <?php
 include "db_connection.php";
 
+session_start();
+
 $successMessage = "";
 $errorMessage = "";
 
@@ -36,19 +38,11 @@ $result = $conn->query("SELECT * FROM employment");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employment Contract Form</title>
 
-    <!-- Tailwind CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- datatable style cdn -->
-    <link rel="stylesheet" href="//cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
-    <!-- jquery cdn  -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="//cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.min.css">
     <!-- font awesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
-<script>
-    
-</script>
 <body>
     <!-- EMPLOYMENT FORM STARTS HERE!!!! -->
     <h1>Employment Contract Form</h1>
@@ -56,7 +50,7 @@ $result = $conn->query("SELECT * FROM employment");
     <a href="benefits_management/benefits.php">Benefits Management</a>
     <a href="position_management/position.php">Position Management</a>
     <a href="employee_management/add_employee.php">Employee Management</a>
-<BR><br>
+    <br><br>
     <form action="employment.php" method="post">
         <!-- CONTRACT NAME -->
         <label for="contractual_name">Contractual Name:</label>
@@ -73,7 +67,6 @@ $result = $conn->query("SELECT * FROM employment");
             <option value="commission-based">Commission Based</option>
             <option value="piece worker">Piece Worker</option>
         </select>
-
         <br><br>
         <!-- TERMS DROPDOWN TIME/DAY -->
         <label for="terms">Terms:</label>
@@ -82,12 +75,10 @@ $result = $conn->query("SELECT * FROM employment");
             <option value="time">Time</option>
             <option value="day">Day</option>
         </select>
-
         <br><br>
-        <!-- DURATION INPUT NUMBER!!!! -->
+        <!-- DURATION INPUT NUMBER -->
         <label id="durationLabel" for="duration">Duration:</label>
         <input type="number" id="duration" name="duration">
-
         <br><br>
         <!-- SUBMIT -->
         <input type="submit" value="Submit">
@@ -99,41 +90,53 @@ $result = $conn->query("SELECT * FROM employment");
         <p><?php echo $errorMessage; ?></p>
     <?php endif; ?>
 
-
     <!-- HERES THE DISPLAY TABLE!!! -->
     <h2>Table</h2>
-    <table border="1">
-        <tr>
-            <th>Contractual Name</th>
-            <th>Compensation Type</th>
-            <th>Terms</th>
-            <th>Duration</th>
-        </tr>
-        <!-- KINUKUHA SA DATABASE NA NA-ADD -->
-        <?php while($row = $result->fetch_assoc()): ?>
+    <table border="1" id="contract_table">
+        <thead>
             <tr>
-                <td><?php echo $row['contractual_name']; ?></td>
-                <td><?php echo $row['employ_compensation']; ?></td>
-                <td><?php echo $row['employ_terms']; ?></td>
-                <td>
-                <!-- CONDITION FOR TIME = HOURS DISPLAY AND DAY = DAYS DISPLAY -->
-                <?php
-                if($row['employ_terms'] == 'Time'){
-                    echo $row['employ_duration'] . " hrs";
-                } elseif($row['employ_terms'] == 'Day') {
-                    echo $row['employ_duration'] . " days";
-                }
-                else {
-                    echo "No data ";
-                }
-                ?></td>
-
+                <th>Contractual Name</th>
+                <th>Compensation Type</th>
+                <th>Terms</th>
+                <th>Duration</th>
             </tr>
-        <?php endwhile; ?>
+        </thead>
+        <tbody>
+            <!-- KINUKUHA SA DATABASE NA NA-ADD -->
+            <?php while($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo $row['contractual_name']; ?></td>
+                    <td><?php echo $row['employ_compensation']; ?></td>
+                    <td><?php echo $row['employ_terms']; ?></td>
+                    <td>
+                    <!-- CONDITION FOR TIME = HOURS DISPLAY AND DAY = DAYS DISPLAY -->
+                    <?php
+                    if($row['employ_terms'] == 'Time'){
+                        echo $row['employ_duration'] . " hrs";
+                    } elseif($row['employ_terms'] == 'Day') {
+                        echo $row['employ_duration'] . " days";
+                    } else {
+                        echo "No data ";
+                    }
+                    ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
     </table>
 
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS CDN -->
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
+    <!-- DataTables Initialization Script -->
+    <script>
+        $(document).ready( function () {
+            $('#contract_table').DataTable();
+        });
+    </script>
 </body>
 </html>
+
 
 <?php
 $conn->close();
