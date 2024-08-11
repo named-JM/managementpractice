@@ -1,7 +1,8 @@
 <?php
+// update_status.php
 include "../db_connection.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ben_id']) && isset($_POST['ben_status'])) {
     $ben_id = $_POST['ben_id'];
     $ben_status = $_POST['ben_status'];
 
@@ -9,12 +10,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("si", $ben_status, $ben_id);
 
     if ($stmt->execute()) {
-        echo "Benefit status updated successfully.";
+        echo "Status updated successfully.";
     } else {
         echo "Error: " . $stmt->error;
     }
     $stmt->close();
 }
-
 $conn->close();
+
 ?>

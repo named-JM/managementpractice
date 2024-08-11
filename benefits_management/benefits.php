@@ -70,7 +70,7 @@ $result = $conn->query($sql);
     <h1>Benefits</h1>
     <form action="benefits.php" method="post">
         <label for="ben_name">Benefit Name:</label>
-        <input type="text" id="ben_name" name="ben_name" class="border rounded px-2 py-1">
+        <input type="text" id="ben_name" name="ben_name" class="border rounded px-2 py-1" required>
         <br><br>
         <input type="submit" name="add_benefit" value="Add Benefit" class="bg-blue-500 text-white px-4 py-2 rounded">
     </form>
@@ -89,17 +89,19 @@ $result = $conn->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row["ben_name"] . "</td>";
+                    echo "<td>" . htmlspecialchars($row["ben_name"]) . "</td>";
                     echo "<td>
+
                             <select name='ben_status' data-ben-id='" . $row["ben_id"] . "' class='border rounded px-2 py-1'>
-                                <option value='active'" . ($row['ben_status'] == 'active' ? ' selected' : '') . ">Active</option>
+                            <option value='" . htmlspecialchars($row['ben_status']) . "' selected>" . ucfirst($row['ben_status']) . "</option>//i want the value here of the current updated status of the ben name
+                            <option value='active'" . ($row['ben_status'] == 'active' ? ' selected' : '') . ">Active</option>
                                 <option value='on hold'" . ($row['ben_status'] == 'on hold' ? ' selected' : '') . ">On Hold</option>
                                 <option value='pending'" . ($row['ben_status'] == 'pending' ? ' selected' : '') . ">Pending</option>
                             </select>
-                          </td>";
+                        </td>";
                     echo "<td>
                             <a href='benefits_list.php?ben_id=" . $row["ben_id"] . "' class='text-blue-500'>View List</a>
-                          </td>";
+                        </td>";
                     echo "</tr>";
                 }
             } else {
