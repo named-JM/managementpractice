@@ -71,8 +71,33 @@ $result = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benefits List</title>
+    <!-- TAILWING CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- tialiwind css file -->
+    <link href="./output.css" rel="stylesheet">
+    <!-- datatable style cdn -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.min.css">
+    <!-- font awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- SWEETALERT2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- As an old-school alternative, you can initialize the plugin by referencing the necessary files: -->
+    <script src="sweetalert2.all.min.js"></script>
+    <!-- Or with the stylesheet separately if desired: -->
+    <script src="sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="sweetalert2.min.css">
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS CDN -->
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
+    <!-- DataTables Initialization Script -->
+    <script>
+        $(document).ready( function () {
+            $('#benefits_table').DataTable();
+        });
+    </script>
 </head>
-<body>
+<body class="bg-gray-100 p-20 m-2">
     <br><br>
     <!-- NAVIGATION PAGE LINKS -->
     <a href="benefits.php">Back to benefits</a>
@@ -97,13 +122,16 @@ $result = $stmt->get_result();
     
 
     <h2>Benefits List for ben_id: <?php echo $ben_id; ?></h2>
-    <table border="1">
+    <table border="1" id="benefits_table" class="display w-full bg-white rounded-lg shadow-lg">
+        <thead>
         <tr>
             <th>Range Start</th>
             <th>Range End</th>
             <th>Employee Amount</th>
             <th>Employer Amount</th>
         </tr>
+        </thead>
+        <tbody>
         <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
     
@@ -113,6 +141,7 @@ $result = $stmt->get_result();
             <td><?php echo $row['ben_employer_amount']; ?></td>
         </tr>
         <?php endwhile; ?>
+        </tbody>
     </table>
 
 </body>

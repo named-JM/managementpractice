@@ -9,23 +9,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_benefit'])) {
     $stmt->bind_param("s", $ben_name);
 
     if ($stmt->execute()) {
-        echo "Benefit added successfully.";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-    $stmt->close();
-}
-
-// UPDATE STATUS
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_status'])) {
-    $ben_id = $_POST['ben_id'];
-    $ben_status = $_POST['ben_status'];
-
-    $stmt = $conn->prepare("UPDATE benefits SET ben_status = ? WHERE ben_id = ?");
-    $stmt->bind_param("si", $ben_status, $ben_id);
-
-    if ($stmt->execute()) {
-        echo "Benefit status updated successfully.";
+        header("Location: benefits.php"); // Redirect to prevent resubmission
+        exit();
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -36,52 +21,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_status'])) {
 $sql = "SELECT * FROM benefits";
 $result = $conn->query($sql);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benefits</title>
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            border: 1px solid #ccc;
-            padding: 20px;
-            background: #fff;
-            z-index: 1000;
-        }
-        .popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-    </style>
-</head>
-<body>
-    <br><br>
-    <a href="../employment.php">Back to Employment</a>
+    <!-- TAILWIND CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS file -->
+    <link href="./output.css" rel="stylesheet">
+    <!-- DataTable style CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS CDN -->
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
+    <!-- DataTables Initialization Script -->
+    <script>
+        $(document).ready(function () {
+            $('#benefits_table').DataTable();
 
+            // Update status on change
+            $('select[name="ben_status"]').on('change', function () {
+                var ben_id = $(this).data('ben-id');
+                var ben_status = $(this).val();
+
+                $.ajax({
+                    url: 'update_status.php',
+                    type: 'POST',
+                    data: { ben_id: ben_id, ben_status: ben_status },
+                    success: function (response) {
+                        alert("Benefit status updated successfully.");
+                    },
+                    error: function () {
+                        alert("Error updating status.");
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body class="bg-gray-100 p-20 m-2">
+    <br><br>
     <!-- BENEFITS FORM -->
     <h1>Benefits</h1>
     <form action="benefits.php" method="post">
         <label for="ben_name">Benefit Name:</label>
-        <input type="text" id="ben_name" name="ben_name">
+        <input type="text" id="ben_name" name="ben_name" class="border rounded px-2 py-1">
         <br><br>
-        <input type="submit" name="add_benefit" value="Add Benefit">
+        <input type="submit" name="add_benefit" value="Add Benefit" class="bg-blue-500 text-white px-4 py-2 rounded">
     </form>
 
     <h2>Benefits List</h2>
-    <table border="1">
+    <table border="1" id="benefits_table" class="display w-full bg-white rounded-lg shadow-lg">
         <thead>
             <tr>
                 <th>Name</th>
@@ -95,11 +90,16 @@ $result = $conn->query($sql);
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
                     echo "<td>" . $row["ben_name"] . "</td>";
-                    echo "<td>" . $row["ben_status"] . "</td>";
                     echo "<td>
-                    <button type='button' onclick='openPopup(" . $row["ben_id"] . ")'>Edit Status</button>
-                    <a href='benefits_list.php?ben_id=" . $row["ben_id"] . "'>View List</a>
-                    </td>";
+                            <select name='ben_status' data-ben-id='" . $row["ben_id"] . "' class='border rounded px-2 py-1'>
+                                <option value='active'" . ($row['ben_status'] == 'active' ? ' selected' : '') . ">Active</option>
+                                <option value='on hold'" . ($row['ben_status'] == 'on hold' ? ' selected' : '') . ">On Hold</option>
+                                <option value='pending'" . ($row['ben_status'] == 'pending' ? ' selected' : '') . ">Pending</option>
+                            </select>
+                          </td>";
+                    echo "<td>
+                            <a href='benefits_list.php?ben_id=" . $row["ben_id"] . "' class='text-blue-500'>View List</a>
+                          </td>";
                     echo "</tr>";
                 }
             } else {
@@ -108,42 +108,8 @@ $result = $conn->query($sql);
             ?>
         </tbody>
     </table>
-    
-
-    <!-- Popup Overlay -->
-    <div id="popup-overlay" class="popup-overlay"></div>
-
-    <!-- Popup Form -->
-    <div id="popup" class="popup">
-        <form id="updateForm" action="benefits.php" method="post">
-            <input type="hidden" id="ben_id" name="ben_id">
-            <label for="ben_status">Status:</label>
-            <select id="ben_status" name="ben_status">
-                <option value="active">Active</option>
-                <option value="on hold">On Hold</option>
-                <option value="pending">Pending</option>
-            </select>
-            <br><br>
-            <input type="submit" name="update_status" value="Update Status">
-            <button type="button" onclick="closePopup()">Cancel</button>
-        </form>
-    </div>
-
-    <script>
-        function openPopup(benId) {
-            document.getElementById('ben_id').value = benId;
-            document.getElementById('popup-overlay').style.display = 'block';
-            document.getElementById('popup').style.display = 'block';
-        }
-
-        function closePopup() {
-            document.getElementById('popup-overlay').style.display = 'none';
-            document.getElementById('popup').style.display = 'none';
-        }
-    </script>
 </body>
 </html>
-
 <?php
 $conn->close();
 ?>
