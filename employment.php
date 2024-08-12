@@ -12,9 +12,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $terms = $_POST['terms'] ?? '';
     $duration = $_POST['duration'] ?? '';
 
-    if (!empty($contractual_name) && !empty($compensation) && !empty($terms) && !empty($duration)) {
-        $stmt = $conn->prepare("INSERT INTO employment (contractual_name, employ_compensation, employ_terms, employ_duration, employ_status) VALUES (?, ?, ?, ?, 0)");
-        $stmt->bind_param("ssss", $contractual_name, $compensation, $terms, $duration);
+    if (!empty($compensation) && !empty($terms) && !empty($duration)) {
+        $stmt = $conn->prepare("INSERT INTO employment ( employ_compensation, employ_terms, employ_duration, employ_status) VALUES ( ?, ?, ?, 0)");
+        $stmt->bind_param("sss", $compensation, $terms, $duration);
 
         if ($stmt->execute()) {
             $successMessage = "New record created successfully.";
@@ -129,10 +129,10 @@ $result = $conn->query("SELECT * FROM employment");
             title: 'Employment Contract Form',
             html: `
             <form id="contractForm" class="space-y-4 text-left">
-                <!-- CONTRACT NAME -->
+                <!-- CONTRACT NAME
                 <label for="contractual_name" class="text-sm font-medium">Contractual Name: <span class="text-red-500">*</span></label>
                 <input type="text" id="contractual_name" name="contractual_name" class="w-full p-2 text-sm border rounded-md">
-                
+                -->
                 <!-- COMPENSATION FORM DROPDOWN -->
                 <label for="compensation" class="text-sm font-medium">Compensation Type: <span class="text-red-500">*</span></label>
                 <select id="compensation" name="compensation" class="w-full p-2 text-sm border rounded-md">
@@ -168,13 +168,13 @@ $result = $conn->query("SELECT * FROM employment");
                 popup: 'swal-wide', // Additional custom class if needed
             },
             preConfirm: () => {
-            const contractual_name = document.getElementById('contractual_name').value;
+            // const contractual_name = document.getElementById('contractual_name').value;
             const compensation = document.getElementById('compensation').value;
             const terms = document.getElementById('terms').value;
             const duration = document.getElementById('duration').value;
 
             // Perform validation
-            if (!contractual_name || !compensation || !terms || !duration) {
+            if (!compensation || !terms || !duration) {
                 Swal.showValidationMessage('Please fill out all required fields.');
                 return false;
             }
@@ -186,7 +186,7 @@ $result = $conn->query("SELECT * FROM employment");
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: new URLSearchParams({
-                    'contractual_name': contractual_name,
+                    // 'contractual_name': contractual_name,
                     'compensation': compensation,
                     'terms': terms,
                     'duration': duration
@@ -225,7 +225,7 @@ $result = $conn->query("SELECT * FROM employment");
     <table border="1" id="contract_table" class="w-full bg-white rounded-lg shadow-lg display">
         <thead >
             <tr>
-                <th>Contractual Name</th>
+                <!-- <th>Contractual Name</th> -->
                 <th>Compensation Type</th>
                 <th>Terms</th>
                 <th>Duration</th>
@@ -235,7 +235,7 @@ $result = $conn->query("SELECT * FROM employment");
             <!-- KINUKUHA SA DATABASE NA NA-ADD -->
             <?php while($row = $result->fetch_assoc()): ?>
                 <tr>
-                    <td><?php echo $row['contractual_name']; ?></td>
+                    <!-- <td><?php echo $row['contractual_name']; ?></td> -->
                     <td><?php echo $row['employ_compensation']; ?></td>
                     <td><?php echo $row['employ_terms']; ?></td>
                     <td>
