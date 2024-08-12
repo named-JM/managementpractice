@@ -5,16 +5,26 @@ include "../db_connection.php";
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_benefit'])) {
     $ben_name = $_POST['ben_name'];
 
-    $stmt = $conn->prepare("INSERT INTO benefits (ben_name, ben_status) VALUES (?, 'active')");
-    $stmt->bind_param("s", $ben_name);
+    if (!empty($ben_name)) {
+        $stmt = $conn->prepare("INSERT INTO benefits (ben_name, ben_status) VALUES (?, 'active')");
+        $stmt->bind_param("s", $ben_name);
 
-    if ($stmt->execute()) {
-        header("Location: benefits.php"); // Redirect to prevent resubmission
-        exit();
+        if ($stmt->execute()) {
+            header("Location: benefits.php"); // Redirect to prevent resubmission
+            exit();
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+        $stmt->close();
     } else {
-        echo "Error: " . $stmt->error;
+        echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Benefit Name is required!',
+                });
+            </script>";
     }
-    $stmt->close();
 }
 
 // Fetch benefits
@@ -70,25 +80,25 @@ $result = $conn->query($sql);
 </head>
 <style>
     .swal2-popup {
-            width: 500px !important;
-            padding: 20px !important;
-            text-align: left;
-        }
-        .swal2-content {
-            text-align: left !important;
-        }
-        .swal2-input {
-            width: 100% !important;
-            margin-bottom: 15px;
-        }
-        .swal2-select {
-            width: 100% !important;
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 10px;
-        }
+        width: 500px !important;
+        padding: 20px !important;
+        text-align: left;
+    }
+    .swal2-content {
+        text-align: left !important;
+    }
+    .swal2-input {
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+    .swal2-select {
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+    label {
+        display: block;
+        margin-bottom: 10px;
+    }
         
     span.ripple {
         position: absolute;
@@ -96,13 +106,13 @@ $result = $conn->query($sql);
         transform: scale(0);
         animation: ripple 600ms linear;
         background-color: rgba(255, 255, 255, 0.7);
-        }
-        @keyframes ripple {
+    }
+    @keyframes ripple {
         to {
             transform: scale(4);
             opacity: 0;
         }
-        }
+    }
 </style>
 <body class="p-20 m-2 bg-gray-100">
     <br><br>
@@ -112,51 +122,54 @@ $result = $conn->query($sql);
     <script>
         // BUTTON CLICK EFFECT
         function rippleEffect(event) {
-                const btn = event.currentTarget;
+            const btn = event.currentTarget;
 
-                const circle = document.createElement("span");
-                const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-                const radius = diameter / 2;
+            const circle = document.createElement("span");
+            const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+            const radius = diameter / 2;
 
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
-                circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
-                circle.classList.add("ripple");
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
+            circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
+            circle.classList.add("ripple");
 
-                const ripple = btn.getElementsByClassName("ripple")[0];
+            const ripple = btn.getElementsByClassName("ripple")[0];
 
-                if (ripple) {
-                    ripple.remove();
-                }
-                btn.appendChild(circle);
+            if (ripple) {
+                ripple.remove();
             }
-            const btn = document.getElementById("openFormBtn");
-            btn.addEventListener("click", rippleEffect);
+            btn.appendChild(circle);
+        }
+        const btn = document.getElementById("openFormBtn");
+        btn.addEventListener("click", rippleEffect);
             
         // SWEETALERT FORM SCRIPT
         document.getElementById('openFormBtn').addEventListener('click', function() {
             Swal.fire({
-            title: 'Benefits Form',
-            html: `
-            <!-- BENEFITS FORM -->
-                <form id="benefitsForm" action="benefits.php" method="post">
-                    <label for="ben_name" class="text-left">Benefit Name: <span class="text-red-500">*</span></label>
-                    <input type="text" id="ben_name" name="ben_name" class="w-full py-1 pl-0 text-left border rounded" required>
+                title: 'Benefits Form',
+                html: `
+                <!-- BENEFITS FORM -->
+                    <form id="benefitsForm" action="benefits.php" method="post">
+                        <label for="ben_name" class="text-left">Benefit Name: <span class="text-red-500">*</span></label>
+                        <input type="text" id="ben_name" name="ben_name" class="w-full py-1 pl-0 text-left border rounded" required>
 
-                    <br><br>
-                    <input type="hidden" name="add_benefit" value="1">
-                </form>
-
-            `,
-            showCancelButton: true,
+                        <br><br>
+                        <input type="hidden" name="add_benefit" value="1">
+                    </form>
+                `,
+                showCancelButton: true,
                 cancelButtonColor: "#d33",
                 confirmButtonText: 'Submit',
                 width: '400px',
                 customClass: {
-                    popup: 'swal-wide', // Additional custom class if needed
+                    popup: 'swal-wide',
                 },
                 preConfirm: () => {
-                    // Trigger form submission
+                    const ben_name = document.getElementById('ben_name').value;
+                    if (!ben_name.trim()) {
+                        Swal.showValidationMessage('Benefit Name is required!');
+                        return false;
+                    }
                     document.getElementById('benefitsForm').submit();
                 }
             });
@@ -179,18 +192,14 @@ $result = $conn->query($sql);
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($row["ben_name"]) . "</td>";
                     echo "<td>
-
                             <select name='ben_status' data-ben-id='" . $row["ben_id"] . "' class='px-2 py-1 border rounded'>
-                            <option value='" . htmlspecialchars($row['ben_status']) . " ' selected>" . ucfirst($row['ben_status']) . "</option>//i want the value here of the current updated status of the ben name
-                            <option value='active'" . ($row['ben_status'] == 'active' ? ' selected' : '') . ">Active</option>
+                                <option value='active'" . ($row['ben_status'] == 'active' ? ' selected' : '') . ">Active</option>
                                 <option value='on hold'" . ($row['ben_status'] == 'on hold' ? ' selected' : '') . ">On Hold</option>
                                 <option value='pending'" . ($row['ben_status'] == 'pending' ? ' selected' : '') . ">Pending</option>
                             </select>
-                        
                         </td>";
                     echo "<td>
                         <a href='benefits_list.php?ben_id=" . $row["ben_id"] . "' class='inline-flex items-center px-4 py-1 text-white bg-blue-500 rounded hover:bg-blue-700'><i class='mr-3 fa-solid fa-file-pen'></i>View</a>
-                        
                         </td>";
                     echo "</tr>";
                 }
