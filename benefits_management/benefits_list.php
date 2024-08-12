@@ -91,22 +91,46 @@ $result = $stmt->get_result();
     $(document).ready(function () {
         $('#benefits_table').DataTable();
 
+        // BUTTON CLICK EFFECT
+        function rippleEffect(event) {
+                const btn = event.currentTarget;
+
+                const circle = document.createElement("span");
+                const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+                const radius = diameter / 2;
+
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
+                circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
+                circle.classList.add("ripple");
+
+                const ripple = btn.getElementsByClassName("ripple")[0];
+
+                if (ripple) {
+                    ripple.remove();
+                }
+                btn.appendChild(circle);
+            }
+            const btn = document.getElementById("openFormBtn");
+            btn.addEventListener("click", rippleEffect);
+            
+        // MODAL FORM SWWEEETALERT!!!!
         $('#openFormBtn').on('click', function () {
             Swal.fire({
                 title: 'Benefits Form',
                 html: `
-                    <form id="benefitsForm" action="benefits_list.php?ben_id=${encodeURIComponent(<?php echo $ben_id; ?>)}" method="post">
-                        <label for="ben_list_range_s">Range Start:</label>
-                        <input type="number" id="ben_list_range_s" name="ben_list_range_s" step="0.01" required>
+                    <form id="benefitsForm" action="benefits_list.php?ben_id=${encodeURIComponent(<?php echo $ben_id; ?>)}" method="post" class="space-y-1 text-left">
+                        <label for="ben_list_range_s"class="text-sm font-medium">Range Start:</label>
+                        <input type="number" id="ben_list_range_s" name="ben_list_range_s" step="0.01" class="w-full p-2 text-sm border rounded-md" required>
                         <br><br>
-                        <label for="ben_list_range_e">Range End:</label>
-                        <input type="number" id="ben_list_range_e" name="ben_list_range_e" step="0.01" required>
+                        <label for="ben_list_range_e"class="text-sm font-medium">Range End:</label>
+                        <input type="number" id="ben_list_range_e" name="ben_list_range_e" step="0.01" class="w-full p-2 text-sm border rounded-md"required>
                         <br><br>
-                        <label for="ben_employee_amount">Employee Amount:</label>
-                        <input type="number" id="ben_employee_amount" name="ben_employee_amount" step="0.01" required>
+                        <label for="ben_employee_amount"class="text-sm font-medium">Employee Amount:</label>
+                        <input type="number" id="ben_employee_amount" name="ben_employee_amount" step="0.01" class="w-full p-2 text-sm border rounded-md"required>
                         <br><br>
-                        <label for="ben_employer_amount">Employer Amount:</label>
-                        <input type="number" id="ben_employer_amount" name="ben_employer_amount" step="0.01" required>
+                        <label for="ben_employer_amount"class="text-sm font-medium">Employer Amount:</label>
+                        <input type="number" id="ben_employer_amount" name="ben_employer_amount" step="0.01" class="w-full p-2 text-sm border rounded-md"required>
                         <br><br>
                     </form>
                 `,
@@ -125,16 +149,48 @@ $result = $stmt->get_result();
         });
     });
 </script>
-
+<style>
+    .swal2-popup {
+            width: 500px !important;
+            padding: 20px !important;
+            text-align: left;
+        }
+        .swal2-content {
+            text-align: left !important;
+        }
+        .swal2-input {
+            width: 100% !important;
+            margin-bottom: 15px;
+        }
+        .swal2-select {
+            width: 100% !important;
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+    span.ripple {
+        position: absolute;
+        border-radius: 50%;
+        transform: scale(0);
+        animation: ripple 600ms linear;
+        background-color: rgba(255, 255, 255, 0.7);
+        }
+        @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+        }
+</style>
 </head>
-<body class="bg-gray-100 p-20 m-2">
+<body class="p-20 m-2 bg-gray-100">
     <br><br>
-    <!-- NAVIGATION PAGE LINKS -->
-    <a href="benefits.php">Back to benefits</a>
-    <h1>Benefits List</h1>
 
     <button type="button" id="openFormBtn"
-        class="rounded px-5 py-3 min-w-max overflow-hidden shadow relative bg-indigo-500 text-white hover:bg-opacity-90">
+        class="relative px-5 py-3 overflow-hidden text-white bg-indigo-500 rounded shadow min-w-max hover:bg-opacity-90">
         Add Benefits Range
     </button>
     
@@ -142,7 +198,7 @@ $result = $stmt->get_result();
     
 
     <h2>Benefits List for ben_id: <?php echo $ben_id; ?></h2>
-    <table border="1" id="benefits_table" class="display w-full bg-white rounded-lg shadow-lg">
+    <table border="1" id="benefits_table" class="w-full bg-white rounded-lg shadow-lg display">
         <thead>
         <tr>
             <th>Range Start</th>
