@@ -90,48 +90,16 @@ $result = $conn->query("SELECT * FROM employment");
         }
         }
 </style>
-<body class="bg-gray-100 p-20 m-2">
+<body class="p-20 m-2 bg-gray-100">
     <!-- EMPLOYMENT FORM STARTS HERE!!!! -->
     <h1 class="text-2xl font-black">Employment Contract Form</h1>
     <br><br>
-
-    <!-- BUTTON TO OPEN THE FORM IN SWEETALERT -->
-    <!-- <button id="openFormBtn" class="text-white bg-gradient-to-br from-pink-500 to-amber-500 hover:bg-gradient-to-bl bg-black focus:ring-4 focus:outline-none
-    focus:ring-pink-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Open Form</button>
-
-    <button class="
-        group
-        p-2
-        cursor-pointer 
-        relative  
-        text-sm
-        font-normal 
-        border-0 
-        flex 
-        items-center 
-        justify-center
-        bg-transparent
-         text-red-500 
-         h-auto  
-         w-[200px]  
-         overflow-hidden   
-         transition-all
-         duration-100">
-        <span class="group-hover:w-full absolute left-0 h-full w-5 border-y border-l border-red-500 transition-all duration-500"></span>
-
-        <p class="">ADD COMPENSATION</p>
-        <span
-            class="group-hover:w-full absolute right-0 h-full w-5  border-y border-r  border-red-500 transition-all duration-500">
-        </span>
-        </button> -->
-<br><br>
     <button type="button" id="openFormBtn"
-        class="rounded px-5 py-3 min-w-max overflow-hidden shadow relative bg-indigo-500 text-white hover:bg-opacity-90">
+        class="relative px-5 py-3 overflow-hidden text-white bg-indigo-500 rounded shadow min-w-max hover:bg-opacity-90">
         Add Employee Contract
     </button>
 
     <script>
-
         function rippleEffect(event) {
                 const btn = event.currentTarget;
 
@@ -153,19 +121,21 @@ $result = $conn->query("SELECT * FROM employment");
             }
             const btn = document.getElementById("openFormBtn");
             btn.addEventListener("click", rippleEffect);
+
+            
         // SWEETALERT FORM SCRIPT
         document.getElementById('openFormBtn').addEventListener('click', function() {
             Swal.fire({
             title: 'Employment Contract Form',
             html: `
-            <form id="contractForm" class="text-left space-y-4">
+            <form id="contractForm" class="space-y-4 text-left">
                 <!-- CONTRACT NAME -->
                 <label for="contractual_name" class="text-sm font-medium">Contractual Name: <span class="text-red-500">*</span></label>
-                <input type="text" id="contractual_name" name="contractual_name" class="w-full text-sm p-2 border rounded-md">
+                <input type="text" id="contractual_name" name="contractual_name" class="w-full p-2 text-sm border rounded-md">
                 
                 <!-- COMPENSATION FORM DROPDOWN -->
                 <label for="compensation" class="text-sm font-medium">Compensation Type: <span class="text-red-500">*</span></label>
-                <select id="compensation" name="compensation" class="w-full text-sm p-2 border rounded-md">
+                <select id="compensation" name="compensation" class="w-full p-2 text-sm border rounded-md">
                     <option value="">Select Compensation</option>
                     <option value="contractual">Contractual</option>
                     <option value="fixed rate">Fixed Rate</option>
@@ -177,7 +147,7 @@ $result = $conn->query("SELECT * FROM employment");
                 
                 <!-- TERMS DROPDOWN TIME/DAY -->
                 <label for="terms" class="text-sm font-medium">Terms: <span class="text-red-500">*</span></label>
-                <select id="terms" name="terms" class="w-full text-sm p-2 border rounded-md">
+                <select id="terms" name="terms" class="w-full p-2 text-sm border rounded-md">
                     <option value="">Select Term</option>
                     <option value="time">Time</option>
                     <option value="day">Day</option>
@@ -185,9 +155,9 @@ $result = $conn->query("SELECT * FROM employment");
                 
                 <!-- DURATION INPUT NUMBER -->
                 <label id="durationLabel" for="duration" class="text-sm font-medium">Duration: <span class="text-red-500">*</span></label>
-                <input type="number" id="duration" name="duration" class="w-full text-sm p-2 border rounded-md">
+                <input type="number" id="duration" name="duration" class="w-full p-2 text-sm border rounded-md">
                 <!-- ERROR MESSAGES PLACEHOLDER -->
-                    <div id="errorMessages" class="text-red-500 text-sm"></div>
+                    <div id="errorMessages" class="text-sm text-red-500"></div>
             </form>
             `,
             showCancelButton: true,
@@ -252,7 +222,7 @@ $result = $conn->query("SELECT * FROM employment");
 
 
     <!-- HERES THE DISPLAY TABLE!!! -->
-    <table border="1" id="contract_table" class="display w-full bg-white rounded-lg shadow-lg">
+    <table border="1" id="contract_table" class="w-full bg-white rounded-lg shadow-lg display">
         <thead >
             <tr>
                 <th>Contractual Name</th>

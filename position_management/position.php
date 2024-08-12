@@ -217,7 +217,6 @@ if ($benefits->num_rows > 0) {
 <body class="p-20 m-2 bg-gray-100">
 
     <!-- POSITION FORM MANAGEMENT!!-->
-    <h1>POSITION MANAGEMENT</h1>
     <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
         <p>Position and benefits added successfully.</p>
     <?php endif; ?>
@@ -227,7 +226,7 @@ if ($benefits->num_rows > 0) {
         Add Position
     </button>
 
-    <h2>Table</h2>
+
     <table border="1" id="position_table" class="w-full bg-white rounded-lg shadow-lg display">
         <thead>
         <tr>
