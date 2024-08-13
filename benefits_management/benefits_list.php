@@ -3,7 +3,7 @@ include "../db_connection.php";
 
 $ben_id = $_GET['ben_id'] ?? '';
 
-// CHECKING FOR OVERLAPPING IN THE DATA TABLE RANGES!!!
+// Function to check for overlapping ranges
 function isRangeOverlap($conn, $ben_id, $start, $end) {
     $stmt = $conn->prepare("SELECT * FROM benefits_lists WHERE ben_id = ? AND ((ben_list_range_s <= ? AND ben_list_range_e >= ?) OR (ben_list_range_s <= ? AND ben_list_range_e >= ?))");
     $stmt->bind_param("idddd", $ben_id, $end, $end, $start, $start);
@@ -13,33 +13,41 @@ function isRangeOverlap($conn, $ben_id, $start, $end) {
     return $result->num_rows > 0;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Handle AJAX request for range overlap check
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['check_overlap'])) {
+    $ben_list_range_s = $_POST['ben_list_range_s'] ?? '';
+    $ben_list_range_e = $_POST['ben_list_range_e'] ?? '';
+
+    if (!empty($ben_list_range_s) && !empty($ben_list_range_e)) {
+        $overlap = isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e);
+        echo json_encode(['overlap' => $overlap]);
+    } else {
+        echo json_encode(['overlap' => false]);
+    }
+    exit;
+}
+
+// Existing form handling code
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['check_overlap'])) {
     $ben_list_range_s = $_POST['ben_list_range_s'] ?? '';
     $ben_list_range_e = $_POST['ben_list_range_e'] ?? '';
     $ben_employee_amount = $_POST['ben_employee_amount'] ?? '';
     $ben_employer_amount = $_POST['ben_employer_amount'] ?? '';
 
-    // JUST A DISPLAYING
-    // echo "<br>ben_id: $ben_id<br>";
-    // echo "ben_list_range_s: $ben_list_range_s<br>";
-    // echo "ben_list_range_e: $ben_list_range_e<br>";
-    // echo "ben_employee_amount: $ben_employee_amount<br>";
-    // echo "ben_employer_amount: $ben_employer_amount<br>";
-
     if (!empty($ben_list_range_s) && !empty($ben_list_range_e) && !empty($ben_employee_amount) && !empty($ben_employer_amount)) {
         if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e)) {
-            echo "Error: The range overlaps with an existing range.";
+            // echo "Error: The range overlaps with an existing range.";
         } else {
-            //CHECKING IF BEN ID EXIST IN THE TABLE
+            // Check if ben_id exists in the table
             $stmt_check = $conn->prepare("SELECT ben_id FROM benefits WHERE ben_id = ?");
             $stmt_check->bind_param("i", $ben_id);
             $stmt_check->execute();
             $result_check = $stmt_check->get_result();
-            // INSERTING
+            
+            // Insert new benefits list entry
             if ($result_check->num_rows == 0) {
                 echo "Error: ben_id does not exist in benefits table.";
             } else {
-                // INSERTING/ADDING BENEFITS LIST
                 $stmt = $conn->prepare("INSERT INTO benefits_lists (ben_id, ben_list_range_s, ben_list_range_e, ben_employee_amount, ben_employer_amount) VALUES (?, ?, ?, ?, ?)");
                 $stmt->bind_param("idddd", $ben_id, $ben_list_range_s, $ben_list_range_e, $ben_employee_amount, $ben_employer_amount);
 
@@ -53,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_check->close();
         }
     } else {
-        echo "All fields are required.";
+        // echo "All fields are required.";
     }
 }
 
@@ -64,6 +72,7 @@ $stmt->bind_param("i", $ben_id);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,67 +97,96 @@ $result = $stmt->get_result();
     <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
     <!-- DataTables Initialization Script -->
     <script>
-    $(document).ready(function () {
-        $('#benefits_table').DataTable();
+$(document).ready(function () {
+    $('#benefits_table').DataTable();
 
-        // BUTTON CLICK EFFECT
-        function rippleEffect(event) {
-                const btn = event.currentTarget;
+    function rippleEffect(event) {
+        const btn = event.currentTarget;
 
-                const circle = document.createElement("span");
-                const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-                const radius = diameter / 2;
+        const circle = document.createElement("span");
+        const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+        const radius = diameter / 2;
 
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
-                circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
-                circle.classList.add("ripple");
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
+        circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
+        circle.classList.add("ripple");
 
-                const ripple = btn.getElementsByClassName("ripple")[0];
+        const ripple = btn.getElementsByClassName("ripple")[0];
 
-                if (ripple) {
-                    ripple.remove();
+        if (ripple) {
+            ripple.remove();
+        }
+        btn.appendChild(circle);
+    }
+    const btn = document.getElementById("openFormBtn");
+    btn.addEventListener("click", rippleEffect);
+    
+    $('#openFormBtn').on('click', function () {
+        Swal.fire({
+            title: 'Benefits Form',
+            html: `
+                <form id="benefitsForm" method="post" class="space-y-1 text-left">
+                    <label for="ben_list_range_s" class="text-sm font-medium">Range Start:</label>
+                    <input type="number" id="ben_list_range_s" name="ben_list_range_s" step="0.01" class="w-full p-2 text-sm border rounded-md" required>
+                    <br><br>
+                    <label for="ben_list_range_e" class="text-sm font-medium">Range End:</label>
+                    <input type="number" id="ben_list_range_e" name="ben_list_range_e" step="0.01" class="w-full p-2 text-sm border rounded-md" required>
+                    <br><br>
+                    <label for="ben_employee_amount" class="text-sm font-medium">Employee Amount:</label>
+                    <input type="number" id="ben_employee_amount" name="ben_employee_amount" step="0.01" class="w-full p-2 text-sm border rounded-md" required>
+                    <br><br>
+                    <label for="ben_employer_amount" class="text-sm font-medium">Employer Amount:</label>
+                    <input type="number" id="ben_employer_amount" name="ben_employer_amount" step="0.01" class="w-full p-2 text-sm border rounded-md" required>
+                    <br><br>
+                </form>
+            `,
+            showCancelButton: true,
+            cancelButtonColor: "#d33",
+            confirmButtonText: 'Submit',
+            width: '400px',
+            customClass: {
+                popup: 'swal-wide', // Additional custom class if needed
+            },
+            preConfirm: () => {
+                const benListRangeS = document.getElementById('ben_list_range_s').value;
+                const benListRangeE = document.getElementById('ben_list_range_e').value;
+                const benEmployeeAmount = document.getElementById('ben_employee_amount').value;
+                const benEmployerAmount = document.getElementById('ben_employer_amount').value;
+
+                if (!benListRangeS || !benListRangeE || !benEmployeeAmount || !benEmployerAmount) {
+                    Swal.showValidationMessage('All fields are required.');
+                    return false; // Prevent the form from submitting
                 }
-                btn.appendChild(circle);
+
+                // Check for overlapping ranges
+                return $.ajax({
+                    type: 'POST',
+                    url: 'benefits_list.php?ben_id=<?php echo $ben_id; ?>',
+                    data: {
+                        check_overlap: true,
+                        ben_list_range_s: benListRangeS,
+                        ben_list_range_e: benListRangeE
+                    },
+                    dataType: 'json'
+                }).then(response => {
+                    if (response.overlap) {
+                        Swal.showValidationMessage('The range overlaps with an existing range.');
+                        return false; // Prevent the form from submitting
+                    }
+                    // Proceed with form submission
+                    $('#benefitsForm').append('<input type="hidden" name="submitted" value="true">'); // Add a hidden field to indicate form submission
+                    $('#benefitsForm').submit();
+                }).catch(() => {
+                    Swal.showValidationMessage('An error occurred while checking for overlapping ranges.');
+                    return false; // Prevent the form from submitting
+                });
             }
-            const btn = document.getElementById("openFormBtn");
-            btn.addEventListener("click", rippleEffect);
-            
-        // MODAL FORM SWWEEETALERT!!!!
-        $('#openFormBtn').on('click', function () {
-            Swal.fire({
-                title: 'Benefits Form',
-                html: `
-                    <form id="benefitsForm" action="benefits_list.php?ben_id=${encodeURIComponent(<?php echo $ben_id; ?>)}" method="post" class="space-y-1 text-left">
-                        <label for="ben_list_range_s"class="text-sm font-medium">Range Start:</label>
-                        <input type="number" id="ben_list_range_s" name="ben_list_range_s" step="0.01" class="w-full p-2 text-sm border rounded-md" required>
-                        <br><br>
-                        <label for="ben_list_range_e"class="text-sm font-medium">Range End:</label>
-                        <input type="number" id="ben_list_range_e" name="ben_list_range_e" step="0.01" class="w-full p-2 text-sm border rounded-md"required>
-                        <br><br>
-                        <label for="ben_employee_amount"class="text-sm font-medium">Employee Amount:</label>
-                        <input type="number" id="ben_employee_amount" name="ben_employee_amount" step="0.01" class="w-full p-2 text-sm border rounded-md"required>
-                        <br><br>
-                        <label for="ben_employer_amount"class="text-sm font-medium">Employer Amount:</label>
-                        <input type="number" id="ben_employer_amount" name="ben_employer_amount" step="0.01" class="w-full p-2 text-sm border rounded-md"required>
-                        <br><br>
-                    </form>
-                `,
-                showCancelButton: true,
-                cancelButtonColor: "#d33",
-                confirmButtonText: 'Submit',
-                width: '400px',
-                customClass: {
-                    popup: 'swal-wide', // Additional custom class if needed
-                },
-                preConfirm: () => {
-                    // Validate form data here if needed
-                    document.getElementById('benefitsForm').submit();
-                }
-            });
         });
     });
+});
 </script>
+
 <style>
     .swal2-popup {
             width: 500px !important;
