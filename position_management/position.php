@@ -8,8 +8,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $pos_salary = $_POST['pos_salary'];
     $pos_status = "active";
 
-
-    $pos_date = date('Y-m-d H:i:s'); // Correct format for MySQL
+    // Generate the unique POS date identifier
+    $milliseconds = round(microtime(true) * 1000);
+    $formattedDate = date('YmdHis') . substr($milliseconds, -3); // Get current date and time in 'YYYYMMDDHHMMSS' format and add milliseconds
+    $pos_date = "POS-" . $formattedDate;
 
     // Insert data into the position table
     $stmt = $conn->prepare("INSERT INTO position (pos_name, pos_employment, pos_salary, pos_status, pos_date) VALUES (?, ?, ?, ?, ?)");
@@ -37,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $stmt->close();
 }
+
 
 // FETCHING DATA IN EMPLOYMENT TABLE, BENEFITS TABLE, POSITION TABLE
 $contracts = $conn->query("SELECT employ_id, contractual_name, employ_compensation, employ_terms FROM employment");
@@ -233,7 +236,8 @@ if ($benefits->num_rows > 0) {
             <th>Position Name</th>
             <th>Contract</th>
             <th>Salary</th>
-            <th>Date Added</th>
+            <th>Action</th>
+            
         </tr>
         </thead>
         <!-- KINUKUHA SA DATABASE NA NA-ADD -->
@@ -243,8 +247,14 @@ if ($benefits->num_rows > 0) {
                 <td><?php echo $row['pos_name']; ?></td>
                 <td><?php echo $row['pos_employment']; ?></td>
                 <td><?php echo $row['pos_salary']; ?></td>
-                <!-- FORMAT MONTH DATE YEAR -->
-                <td><?php echo date('m-d-Y H:i:s', strtotime($row['pos_date'])); ?></td>
+            
+                <td>
+                <button type="button" 
+                        class="px-3 py-1 text-white bg-green-500 rounded-md hover:bg-green-600" 
+                        onclick="viewBenefits(<?php echo $row['pos_id']; ?>)">
+                    View
+                </button>
+                </td>
             </tr>
         <?php endwhile; ?>
         </tbody>
@@ -272,6 +282,31 @@ if ($benefits->num_rows > 0) {
 function removeBenefit(button) {
     button.parentElement.remove();
 }
+
+
+function viewBenefits(pos_id) {
+        // Fetch the benefits using an AJAX call
+        $.ajax({
+            url: 'position_benefits.php', // You will need to create this PHP file
+            type: 'GET',
+            data: { pos_id: pos_id },
+            success: function(response) {
+                // Display the benefits in a SweetAlert modal
+                Swal.fire({
+                    title: 'Position Benefits',
+                    html: response, // The response contains the HTML of the benefits
+                    width: '500px',
+                    customClass: {
+                        popup: 'swal-wide', // Additional custom class if needed
+                    },
+                    confirmButtonText: 'Close'
+                });
+            },
+            error: function() {
+                Swal.fire('Error', 'Unable to fetch benefits. Please try again later.', 'error');
+            }
+        });
+    }
     </script>
 
 </body>
