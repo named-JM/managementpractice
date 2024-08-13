@@ -258,7 +258,7 @@ if ($benefits->num_rows > 0) {
             
                 <td>
                 <!-- link to the position_benefits kung nasaan yung position name yun yung kukunin to see anong beneftis na nakapa loob doon-->
-                <a href="position_benefits.php?pos_id=<?php echo $row['pos_id']; ?>" class="text-blue-500 hover:underline">View Benefits</a>
+                <a href="position_benefits.php?pos_id=<?php echo $row['pos_id']; ?>" class='inline-flex items-center px-4 py-1 text-white bg-blue-500 rounded hover:bg-blue-700'>View Benefits</a>
                 </td>
             </tr>
         <?php endwhile; ?>

@@ -115,25 +115,26 @@ if (isset($_GET['pos_id'])) {
         html: `
         <form id="posBenefitsForm" action="position_benefits.php?pos_id=<?php echo htmlspecialchars($pos_id); ?>" method="POST">
         <select name="benefit[]" id="benefitDropdown" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-            <option value="">Select Benefits</option>
-            <?php while($benefit = $allBenefitsResult->fetch_assoc()): ?>
-                <?php
-                // Check if the benefit is already assigned
-                $isAssigned = false;
-                $benefitsResult->data_seek(0); // Reset the result pointer
-                while($assignedBenefit = $benefitsResult->fetch_assoc()) {
-                    if($assignedBenefit['ben_id'] == $benefit['ben_id']) {
-                        $isAssigned = true;
-                        break;
-                    }
-                }
-                ?>
-                <option value="<?php echo htmlspecialchars($benefit['ben_id']); ?>" <?php echo $isAssigned ? 'disabled' : ''; ?>>
-                    <?php echo htmlspecialchars($benefit['ben_name']); ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-        
+    <option value="">Select Benefits</option>
+    <?php
+    // Reset the result pointer for all benefits
+    $allBenefitsResult->data_seek(0);
+    while($benefit = $allBenefitsResult->fetch_assoc()) {
+        $isAssigned = false;
+        $benefitsResult->data_seek(0); // Reset the result pointer for assigned benefits
+        while($assignedBenefit = $benefitsResult->fetch_assoc()) {
+            if($assignedBenefit['ben_id'] == $benefit['ben_id']) {
+                $isAssigned = true;
+                break;
+            }
+        }
+        $style = $isAssigned ? 'color: red;' : '';
+        $disabled = $isAssigned ? 'disabled' : '';
+        echo '<option value="'.htmlspecialchars($benefit['ben_id']).'" style="'.$style.'" '.$disabled.'>'.htmlspecialchars($benefit['ben_name']).'</option>';
+    }
+    ?>
+</select>
+
     </form>
 
         `,
@@ -183,7 +184,7 @@ if (isset($_GET['pos_id'])) {
                             <form action="remove_benefits.php" method="POST" onsubmit="return confirm('Are you sure you want to remove this benefit?');">
                                 <input type="hidden" name="pos_id" value="<?php echo htmlspecialchars($pos_id); ?>">
                                 <input type="hidden" name="ben_id" value="<?php echo htmlspecialchars($benefit['ben_id']); ?>">
-                                <button type="submit" class="text-red-500 transition hover:text-red-600"><i class="fas fa-trash"></i></button>
+                                <button type="submit" class="inline-flex items-center px-4 py-1 text-red-500 transition hover:text-red-600"><i class="fas fa-trash"></i></button>
                             </form>
                         </td>
                     </tr>
