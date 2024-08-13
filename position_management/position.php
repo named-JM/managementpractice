@@ -46,6 +46,13 @@ $contracts = $conn->query("SELECT employ_id, contractual_name, employ_compensati
 $benefits = $conn->query("SELECT ben_id, ben_name FROM benefits");
 $result = $conn->query("SELECT * FROM position");
 
+// Modify the query to join the employment table and fetch employ_compensation
+$result = $conn->query("
+    SELECT p.*, e.employ_compensation
+    FROM position p
+    JOIN employment e ON p.pos_employment = e.employ_id
+");
+
 // WHERE BENEFITS DROPWDOWN IT WILL DISPLAY THE NAME OF IT AND VALUE OF ITS ID
 $benefitOptions = "";
 if ($benefits->num_rows > 0) {
@@ -245,15 +252,13 @@ if ($benefits->num_rows > 0) {
         <?php while($row = $result->fetch_assoc()): ?>
             <tr>
                 <td><?php echo $row['pos_name']; ?></td>
-                <td><?php echo $row['pos_employment']; ?></td>
+                <td><?php echo $row['employ_compensation']; ?></td> <!-- Display compensation instead of employ_id -->
+                <!-- <td>php echo $row['pos_employment']; </td> -->
                 <td><?php echo $row['pos_salary']; ?></td>
             
                 <td>
-                <button type="button" 
-                        class="px-3 py-1 text-white bg-green-500 rounded-md hover:bg-green-600" 
-                        onclick="viewBenefits(<?php echo $row['pos_id']; ?>)">
-                    View
-                </button>
+                <!-- link to the position_benefits kung nasaan yung position name yun yung kukunin to see anong beneftis na nakapa loob doon-->
+                <a href="position_benefits.php?pos_id=<?php echo $row['pos_id']; ?>" class="text-blue-500 hover:underline">View Benefits</a>
                 </td>
             </tr>
         <?php endwhile; ?>
@@ -284,29 +289,6 @@ function removeBenefit(button) {
 }
 
 
-function viewBenefits(pos_id) {
-        // Fetch the benefits using an AJAX call
-        $.ajax({
-            url: 'position_benefits.php', // You will need to create this PHP file
-            type: 'GET',
-            data: { pos_id: pos_id },
-            success: function(response) {
-                // Display the benefits in a SweetAlert modal
-                Swal.fire({
-                    title: 'Position Benefits',
-                    html: response, // The response contains the HTML of the benefits
-                    width: '500px',
-                    customClass: {
-                        popup: 'swal-wide', // Additional custom class if needed
-                    },
-                    confirmButtonText: 'Close'
-                });
-            },
-            error: function() {
-                Swal.fire('Error', 'Unable to fetch benefits. Please try again later.', 'error');
-            }
-        });
-    }
     </script>
 
 </body>
