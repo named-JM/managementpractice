@@ -192,7 +192,7 @@ $result = $conn->query("SELECT * FROM employee_table");
         // SWEETALERT FORM SCRIPT
         document.getElementById('openFormBtn').addEventListener('click', function() {
             Swal.fire({
-            title: 'Employment Contract Form',
+            title: 'Add Employee Form',
             html: `
             <!-- EMPLOYEE FORM MANAGEMENT -->
             <form id="employeeForm" class="space-y-4 text-left" action="add_employee.php" method="post" enctype="multipart/form-data"> <!--THE multipart FORM DATA TO  MAKE SURE INCLUDES THE FILE UPLOAD-->
