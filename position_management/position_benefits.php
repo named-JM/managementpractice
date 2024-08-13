@@ -85,7 +85,7 @@ if (isset($_GET['pos_id'])) {
 
 
          // BUTTON CLICK EFFECT
-         function rippleEffect(event) {
+        function rippleEffect(event) {
                 const btn = event.currentTarget;
 
                 const circle = document.createElement("span");
