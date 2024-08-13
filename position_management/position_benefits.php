@@ -183,7 +183,7 @@ if (isset($_GET['pos_id'])) {
                             <form action="remove_benefits.php" method="POST" onsubmit="return confirm('Are you sure you want to remove this benefit?');">
                                 <input type="hidden" name="pos_id" value="<?php echo htmlspecialchars($pos_id); ?>">
                                 <input type="hidden" name="ben_id" value="<?php echo htmlspecialchars($benefit['ben_id']); ?>">
-                                <button type="submit" class="text-red-500 transition hover:text-red-600"><i class="fas fa-trash"></i> Remove</button>
+                                <button type="submit" class="text-red-500 transition hover:text-red-600"><i class="fas fa-trash"></i></button>
                             </form>
                         </td>
                     </tr>

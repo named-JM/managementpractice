@@ -3,7 +3,7 @@ include "../db_connection.php";
 
 $ben_id = $_GET['ben_id'] ?? '';
 
-// Function to check for overlapping ranges
+// CHECKING FOR OVERLAPPING IN THE DATA TABLE RANGES!!!
 function isRangeOverlap($conn, $ben_id, $start, $end) {
     $stmt = $conn->prepare("SELECT * FROM benefits_lists WHERE ben_id = ? AND ((ben_list_range_s <= ? AND ben_list_range_e >= ?) OR (ben_list_range_s <= ? AND ben_list_range_e >= ?))");
     $stmt->bind_param("idddd", $ben_id, $end, $end, $start, $start);
@@ -38,16 +38,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['check_overlap'])) {
         if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e)) {
             // echo "Error: The range overlaps with an existing range.";
         } else {
-            // Check if ben_id exists in the table
+            //CHECKING IF BEN ID EXIST IN THE TABLE
             $stmt_check = $conn->prepare("SELECT ben_id FROM benefits WHERE ben_id = ?");
             $stmt_check->bind_param("i", $ben_id);
             $stmt_check->execute();
             $result_check = $stmt_check->get_result();
-            
-            // Insert new benefits list entry
+            // INSERTING NEW BENEFIT LIST!!!!!!!!!!BUT DISPLAY IF THE BEN ID DOES NOT EXIST NO MORE
             if ($result_check->num_rows == 0) {
                 echo "Error: ben_id does not exist in benefits table.";
             } else {
+                // INSERTING/ADDING BENEFITS LIST
                 $stmt = $conn->prepare("INSERT INTO benefits_lists (ben_id, ben_list_range_s, ben_list_range_e, ben_employee_amount, ben_employer_amount) VALUES (?, ?, ?, ?, ?)");
                 $stmt->bind_param("idddd", $ben_id, $ben_list_range_s, $ben_list_range_e, $ben_employee_amount, $ben_employer_amount);
 
@@ -90,7 +90,6 @@ $result = $stmt->get_result();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- SWEETALERT2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables JS CDN -->
@@ -122,6 +121,7 @@ $(document).ready(function () {
     const btn = document.getElementById("openFormBtn");
     btn.addEventListener("click", rippleEffect);
     
+        // MODAL FORM SWWEEETALERT!!!!
     $('#openFormBtn').on('click', function () {
         Swal.fire({
             title: 'Benefits Form',

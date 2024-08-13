@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Check if file is a valid type (you can add more validation)
         $allowedTypes = array("pdf", "doc", "docx");
         if (!in_array($fileType, $allowedTypes)) {
-            echo "<br>Sorry, only PDF, DOC, and DOCX files are allowed.";
+            // echo "<br>Sorry, only PDF, DOC, and DOCX files are allowed.";
             $uploadOk = 0;
         }
 
@@ -192,7 +192,7 @@ $result = $conn->query("SELECT * FROM employee_table");
         // SWEETALERT FORM SCRIPT
         document.getElementById('openFormBtn').addEventListener('click', function() {
             Swal.fire({
-            title: 'Add Employee Form',
+            title: 'Employment Contract Form',
             html: `
             <!-- EMPLOYEE FORM MANAGEMENT -->
             <form id="employeeForm" class="space-y-4 text-left" action="add_employee.php" method="post" enctype="multipart/form-data"> <!--THE multipart FORM DATA TO  MAKE SURE INCLUDES THE FILE UPLOAD-->
@@ -315,8 +315,8 @@ $result = $conn->query("SELECT * FROM employee_table");
     }
     ?>
     
-     <!-- jQuery CDN -->
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables JS CDN -->
     <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
     <!-- DataTables Initialization Script -->
