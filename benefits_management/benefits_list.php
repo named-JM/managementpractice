@@ -9,7 +9,7 @@ $ben_id = $_GET['ben_id'] ?? '';
 
 // CHECKING FOR OVERLAPPING IN THE DATA TABLE RANGES!!!
 function isRangeOverlap($conn, $ben_id, $start, $end, $current_id = null) {
-    $query = "SELECT * FROM benefits_lists WHERE ben_id = ? AND ((ben_list_range_s <= ? AND ben_list_range_e >= ?) OR (ben_list_range_s <= ? AND ben_list_range_e >= ?))";
+    $query = "SELECT * FROM benefits_lists WHERE ben_id = ? AND ((ben_list_range_s <= ? AND ben_list_range_e >= ?) OR (ben_list_range_s >= ? AND ben_list_range_s <= ?))";
     if ($current_id !== null) {
         $query .= " AND ben_list_id != ?";
     }
@@ -17,9 +17,9 @@ function isRangeOverlap($conn, $ben_id, $start, $end, $current_id = null) {
     $stmt = $conn->prepare($query);
     
     if ($current_id !== null) {
-        $stmt->bind_param("iddddi", $ben_id, $end, $end, $start, $start, $current_id);
+        $stmt->bind_param("iddddi", $ben_id, $end, $start, $start, $end, $current_id);
     } else {
-        $stmt->bind_param("idddd", $ben_id, $end, $end, $start, $start);
+        $stmt->bind_param("idddd", $ben_id, $end, $start, $start, $end);
     }
     
     $stmt->execute();
@@ -27,6 +27,8 @@ function isRangeOverlap($conn, $ben_id, $start, $end, $current_id = null) {
     $stmt->close();
     return $result->num_rows > 0;
 }
+
+
 
 // Handle the update request
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
