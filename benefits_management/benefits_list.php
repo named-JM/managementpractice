@@ -6,6 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $ben_id = $_GET['ben_id'] ?? '';
+$ben_name = '';
 
 // CHECKING FOR OVERLAPPING IN THE DATA TABLE RANGES!!!
 function isRangeOverlap($conn, $ben_id, $start, $end, $current_id = null) {
@@ -40,6 +41,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
 
     if (!empty($id) && !empty($ben_list_range_s) && !empty($ben_list_range_e) && !empty($ben_employee_amount) && !empty($ben_employer_amount)) {
         // Exclude the current record from the overlap check
+        if ($ben_list_range_s > $ben_list_range_e) {
+            echo json_encode(['error' => 'The start range cannot be greater than the end range.']);
+            exit;
+        }
         if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e, $id)) {
             echo json_encode(['overlap' => true]);
             exit;
@@ -82,6 +87,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['check_overlap'])) {
     $ben_employer_amount = $_POST['ben_employer_amount'] ?? '';
 
     if (!empty($ben_list_range_s) && !empty($ben_list_range_e) && !empty($ben_employee_amount) && !empty($ben_employer_amount)) {
+        if ($ben_list_range_s > $ben_list_range_e) {
+            echo json_encode(['error' => 'The start range cannot be greater than the end range.']);
+            exit;
+        }
+        
+        
         if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e)) {
             // echo "Error: The range overlaps with an existing range.";
         } else {
@@ -118,6 +129,22 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $ben_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
+
+
+// Fetch the benefit name using the ben_id
+if (!empty($ben_id)) {
+    $stmt_name = $conn->prepare("SELECT ben_name FROM benefits WHERE ben_id = ?");
+    $stmt_name->bind_param("i", $ben_id);
+    $stmt_name->execute();
+    $result_name = $stmt_name->get_result();
+    
+    if ($result_name->num_rows > 0) {
+        $row_name = $result_name->fetch_assoc();
+        $ben_name = $row_name['ben_name'];
+    }
+    $stmt_name->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -190,6 +217,10 @@ $result = $stmt->get_result();
                         let benListRangeS = parseFloat(document.getElementById('ben_list_range_s').value);
                         let benListRangeE = parseFloat(document.getElementById('ben_list_range_e').value);
 
+                        if (benListRangeS > benListRangeE) {
+                            Swal.showValidationMessage('Error: The start range cannot be greater than the end range.');
+                            return false;
+                        }
                         return $.ajax({
                             type: 'POST',
                             url: 'benefits_list.php?ben_id=<?php echo $ben_id; ?>',
@@ -254,6 +285,10 @@ $result = $stmt->get_result();
                         let editBenListRangeS = parseFloat(document.getElementById('edit_ben_list_range_s').value);
                         let editBenListRangeE = parseFloat(document.getElementById('edit_ben_list_range_e').value);
 
+                        if (editBenListRangeS > editBenListRangeE) {
+                            Swal.showValidationMessage('Error: The start range cannot be greater than the end range.');
+                            return false;
+                        }
                         return $.ajax({
                             type: 'POST',
                             url: 'benefits_list.php?ben_id=<?php echo $ben_id; ?>',
@@ -334,7 +369,7 @@ $result = $stmt->get_result();
 
 <div class="container p-4 mx-auto mt-5">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="text-2xl font-bold">Benefits List for Benefit ID: <?php echo $ben_id; ?></h2>
+        <h2 class="text-2xl font-bold">Benefits List for Benefit ID: <?php echo htmlspecialchars($ben_name); ?></h2>
         <button id="openFormBtn" class="px-4 py-2 text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Add Benefits Range</button>
     </div>
 
