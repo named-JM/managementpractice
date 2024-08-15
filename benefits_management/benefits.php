@@ -120,6 +120,10 @@ $result = $conn->query($sql);
         Add Benefits
     </button>
     <script>
+        // AUTO CAPITAL IN THE FIRST LETTER
+        function capitalizeFirstLetter(input) {
+            return input.charAt(0).toUpperCase() + input.slice(1);
+        }
         // BUTTON CLICK EFFECT
         function rippleEffect(event) {
             const btn = event.currentTarget;
@@ -164,12 +168,21 @@ $result = $conn->query($sql);
                 customClass: {
                     popup: 'swal-wide',
                 },
+                // VALIDATION WHEN SUBMITITNG!!!
                 preConfirm: () => {
-                    const ben_name = document.getElementById('ben_name').value;
-                    if (!ben_name.trim()) {
+                    let ben_name = document.getElementById('ben_name').value.trim();
+
+                    if (!ben_name) {
                         Swal.showValidationMessage('Benefit Name is required!');
                         return false;
                     }
+
+                    // CALL FUNCTION TO capitalizeFirstLetter WHEN SUBMITTING
+                    ben_name = capitalizeFirstLetter(ben_name);
+                    document.getElementById('ben_name').value = ben_name;
+                
+
+                    // sSUBMIT THE FORM
                     document.getElementById('benefitsForm').submit();
                 }
             });
