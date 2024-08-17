@@ -212,7 +212,7 @@ $result = $conn->query($sql);
                             </select>
                         </td>";
                     echo "<td>
-                        <a href='benefits_list.php?ben_id=" . $row["ben_id"] . "' class='inline-flex items-center px-4 py-1 text-white bg-blue-500 rounded hover:bg-blue-700'><i class='mr-3 fa-solid fa-file-pen'></i>View</a>
+                        <a href='benefits_list.php?ben_id=" . $row["ben_id"] . "' class='inline-flex items-center px-4 py-1 text-white bg-blue-500 rounded hover:bg-blue-700'><i class='mr-3 fa-solid fa-file-pen'></i> View</a>
                         </td>";
                     echo "</tr>";
                 }
