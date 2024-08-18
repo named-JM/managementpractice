@@ -97,7 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Get fetching the position data table in the database to display the drop-down
 $positions = $conn->query("SELECT pos_id, pos_name FROM position");
-$result = $conn->query("SELECT * FROM employee_table");
+$result = $conn->query("
+    SELECT employee_table.*, position.pos_name 
+    FROM employee_table 
+    JOIN position 
+    ON employee_table.emp_position = position.pos_id
+");
 ?>
 
 <!DOCTYPE html>
@@ -280,11 +285,13 @@ $result = $conn->query("SELECT * FROM employee_table");
                 <th>First Name</th>
                 <th>Middle Name</th>
                 <th>Last Name</th>
+                <th>Position</th>
                 <th>Email</th>
                 <th>Number</th>
                 <th>Zip Code</th>
                 <th>Manager</th>
                 <th>Department</th>
+                <th>Action</th>
                 
             </tr>
         </thead>
@@ -296,11 +303,17 @@ $result = $conn->query("SELECT * FROM employee_table");
                     <td><?php echo $row['emp_fname'];?></td>
                     <td><?php echo $row['emp_mname'];?></td>
                     <td><?php echo $row['emp_lname'];?></td>
+                    <td><?php echo $row['pos_name']; ?></td> <!-- Displaying pos_name instead of emp_position -->
                     <td><?php echo $row['emp_email'];?></td>
                     <td><?php echo $row['emp_number'];?></td>
                     <td><?php echo $row['emp_zip'];?></td>
                     <td><?php echo $row['employ_manager'];?></td>
                     <td><?php echo $row['employ_dept'];?></td>
+                    <td>
+                    <button type="button" class="updateBtn" data-id="<?php echo $row['emp_company_num']; ?>">
+                    <i class="fas fa-edit"></i> Update
+                </button>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
         </tbody>
@@ -314,7 +327,6 @@ $result = $conn->query("SELECT * FROM employee_table");
         echo "<p style='color:red;'>$errorMessage</p>";
     }
     ?>
-    
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables JS CDN -->
@@ -323,6 +335,63 @@ $result = $conn->query("SELECT * FROM employee_table");
     <script>
         $(document).ready( function () {
             $('#employee_table').DataTable();
+            $('.updateBtn').on('click', function() {
+            var emp_company_num = $(this).data('id');
+
+            // Fetch employee data using AJAX
+            $.ajax({
+                url: 'fetch_employee.php',
+                type: 'POST',
+                data: { emp_company_num: emp_company_num },
+                dataType: 'json',
+                success: function(data) {
+                    // Populate SweetAlert form with fetched data
+                    Swal.fire({
+                        title: 'Update Employee',
+                        html: `
+                            <form id="updateEmployeeForm" class="space-y-4 text-left" action="update_employee.php" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="emp_company_num" value="${data.emp_company_num}">
+                            <label for="emp_fname" class="block text-sm font-medium text-gray-700">First Name</label>
+                            <input type="text" id="emp_fname" name="emp_fname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_fname}" required>
+                            <label for="emp_mname" class="block text-sm font-medium text-gray-700">Middle Name</label>
+                            <input type="text" id="emp_mname" name="emp_mname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_mname}" required>
+                            <label for="emp_lname" class="block text-sm font-medium text-gray-700">Last Name</label>
+                            <input type="text" id="emp_lname" name="emp_lname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_lname}" required>
+                            <label for="emp_position" class="block text-sm font-medium text-gray-700">Position</label>
+                            <select name="emp_position" id="emp_position" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                                <option value="${data.emp_position}">${data.pos_name}</option>
+                                <?php
+                                    $positions->data_seek(0);
+                                    while($position = $positions->fetch_assoc()) {
+                                        echo "<option value='" . $position['pos_id'] . "'>" . $position['pos_name'] . "</option>";
+                                    }
+                                ?>
+                            </select>
+                            <label for="emp_email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="emp_email" name="emp_email" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_email}" required>
+                            <label for="emp_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                            <input type="text" id="emp_number" name="emp_number" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_number}" required>
+                            <label for="emp_zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
+                            <input type="text" id="emp_zip" name="emp_zip" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_zip}" required>
+                            <label for="employ_manager" class="block text-sm font-medium text-gray-700">Manager</label>
+                            <input type="text" id="employ_manager" name="employ_manager" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_manager}" required>
+                            <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
+                            <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_dept}" required>
+                            </form>
+                        `,
+                        showCancelButton: true,
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: 'Update',
+                        preConfirm: () => {
+                            document.getElementById('updateEmployeeForm').submit();
+                        }
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        });
         });
     </script>
 </body>
