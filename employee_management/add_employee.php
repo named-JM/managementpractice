@@ -171,7 +171,10 @@ $result = $conn->query("
     </button>
 
     <script>
-
+        // AUTO CAPITAL IN THE FIRST LETTER
+        function capitalizeFirstLetter(input) {
+        return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+    }
         function rippleEffect(event) {
                 const btn = event.currentTarget;
 
@@ -270,7 +273,22 @@ $result = $conn->query("
                     popup: 'swal-wide', // Additional custom class if needed
                 },
                 preConfirm: () => {
-                    // Validate form data here if needed
+
+                    // CALL FUNCTION TO capitalizeFirstLetter WHEN SUBMITTING
+                    let emp_fname = capitalizeFirstLetter(document.getElementById('emp_fname').value);
+                let emp_mname = capitalizeFirstLetter(document.getElementById('emp_mname').value);
+                let emp_lname = capitalizeFirstLetter(document.getElementById('emp_lname').value);
+                let employ_manager = capitalizeFirstLetter(document.getElementById('employ_manager').value);
+                let employ_dept = capitalizeFirstLetter(document.getElementById('employ_dept').value);
+
+                // Set the capitalized values back to the form inputs
+                document.getElementById('emp_fname').value = emp_fname;
+                document.getElementById('emp_mname').value = emp_mname;
+                document.getElementById('emp_lname').value = emp_lname;
+                document.getElementById('employ_manager').value = employ_manager;
+                document.getElementById('employ_dept').value = employ_dept;
+
+                    // SUBMITTING AFTER VALIDATION!!!
                     document.getElementById('employeeForm').submit();
                 }
             });
@@ -291,6 +309,7 @@ $result = $conn->query("
                 <th>Zip Code</th>
                 <th>Manager</th>
                 <th>Department</th>
+                <th>Status</th>
                 <th>Action</th>
                 
             </tr>
@@ -309,6 +328,7 @@ $result = $conn->query("
                     <td><?php echo $row['emp_zip'];?></td>
                     <td><?php echo $row['employ_manager'];?></td>
                     <td><?php echo $row['employ_dept'];?></td>
+                    <td>Example</td>
                     <td>
                     <button type="button" class="updateBtn" data-id="<?php echo $row['emp_company_num']; ?>">
                     <i class="fas fa-edit"></i> Update
