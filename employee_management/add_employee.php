@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $emp_company_num = "EMP-$year-$new_num";
 
         // Handle file upload
-        $uploadsDir = "C:/xampp/secure_uploads/"; // Directory outside the web root
+        $uploadsDir = "C:/xampp/htdocs/management/secure_uploads/"; // Directory outside the web root
         $fileName = basename($_FILES["emp_file"]["name"]);
         $targetFile = $uploadsDir . $fileName;
         $uploadOk = 1;
@@ -312,7 +312,16 @@ $result = $conn->query("
                     <td>
                     <button type="button" class="updateBtn" data-id="<?php echo $row['emp_company_num']; ?>">
                     <i class="fas fa-edit"></i> Update
-                </button>
+                    </button>
+                    <?php if($row['emp_file']): ?>
+                    <a href="../secure_uploads/<?php echo rawurlencode($row['emp_file']); ?>" 
+                    download="<?php echo htmlspecialchars($row['emp_file']); ?>" 
+                    class="text-blue-600 hover:text-blue-800">
+                        Download
+                    </a>
+                    <?php else: ?>
+                        <span class="text-gray-600">No file</span>
+                    <?php endif; ?>
                     </td>
                 </tr>
                 <?php endwhile; ?>
