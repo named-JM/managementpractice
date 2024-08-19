@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $successMessage = "The file " . htmlspecialchars($fileName) . " has been uploaded.";
 
                 // After checking uploaded file, inserting data to the database
-                $stmt = $conn->prepare("INSERT INTO employee_table (emp_fname, emp_mname, emp_lname, emp_position, emp_company_num, emp_email, emp_number, emp_zip, employ_manager, employ_dept, emp_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO employee_table (emp_fname, emp_mname, emp_lname, emp_position, emp_company_num, emp_email, emp_number, emp_zip, employ_manager, employ_dept, emp_status, emp_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?)");
                 $stmt->bind_param("sssissiisss", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_company_num, $emp_email, $emp_number, $emp_zip, $employ_manager, $employ_dept, $fileName);
                 if ($stmt->execute()) {
                     $successMessage .= " New record created successfully.";
@@ -328,7 +328,7 @@ $result = $conn->query("
                     <td><?php echo $row['emp_zip'];?></td>
                     <td><?php echo $row['employ_manager'];?></td>
                     <td><?php echo $row['employ_dept'];?></td>
-                    <td>Example</td>
+                    <td><?php echo htmlspecialchars($row["emp_status"]); ?></td>
                     <td>
                     <button type="button" class="updateBtn" data-id="<?php echo $row['emp_company_num']; ?>">
                     <i class="fas fa-edit"></i> Update
@@ -364,8 +364,12 @@ $result = $conn->query("
     <script>
         $(document).ready( function () {
             $('#employee_table').DataTable();
+
+
+
             $('.updateBtn').on('click', function() {
             var emp_company_num = $(this).data('id');
+            var emp_status = $(this).data('status');
 
             // Fetch employee data using AJAX
             $.ajax({
@@ -406,6 +410,13 @@ $result = $conn->query("
                             <input type="text" id="employ_manager" name="employ_manager" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_manager}" required>
                             <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
                             <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_dept}" required>
+                            
+                            <select id="emp_status" name="emp_status" class="w-full py-2 mt-1 mb-5 text-left border rounded">
+                        <option value="Active" ${emp_status === 'Active' ? 'selected' : ''}>Active</option>
+                        <option value="AWOL" ${emp_status === 'AWOL' ? 'selected' : ''}>AWOL</option>
+                        <option value="Terminated" ${emp_status === 'Terminated' ? 'selected' : ''}>Terminated </option>
+                    </select>
+                            
                             </form>
                         `,
                         showCancelButton: true,

@@ -12,10 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $emp_zip = $_POST['emp_zip'];
     $employ_manager = $_POST['employ_manager'];
     $employ_dept = $_POST['employ_dept'];
+    $emp_status = $_POST['emp_status'];
 
     // Prepare and bind
-    $stmt = $conn->prepare("UPDATE employee_table SET emp_fname=?, emp_mname=?, emp_lname=?, emp_position=?, emp_email=?, emp_number=?, emp_zip=?, employ_manager=?, employ_dept=? WHERE emp_company_num=?");
-    $stmt->bind_param("sssississs", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_email, $emp_number, $emp_zip, $employ_manager, $employ_dept, $emp_company_num);
+    $stmt = $conn->prepare("UPDATE employee_table SET emp_fname=?, emp_mname=?, emp_lname=?, emp_position=?, emp_email=?, emp_number=?, emp_zip=?, employ_manager=?, employ_dept=?, emp_status=? WHERE emp_company_num=?");
+    $stmt->bind_param("sssississss", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_email, $emp_number, $emp_zip, $employ_manager, $employ_dept, $emp_status, $emp_company_num);
 
     if ($stmt->execute()) {
         echo "Record updated successfully";
