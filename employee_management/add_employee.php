@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $emp_company_num = "EMP-$year-$new_num";
 
         // Handle file upload
-        $uploadsDir = "C:/xampp/htdocs/management/secure_uploads/"; // Directory outside the web root
+        $uploadsDir = "C:/xampp/htdocs/management/secure_uploads/";
         $fileName = basename($_FILES["emp_file"]["name"]);
         $targetFile = $uploadsDir . $fileName;
         $uploadOk = 1;
