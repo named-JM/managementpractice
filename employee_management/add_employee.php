@@ -97,12 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Get fetching the position data table in the database to display the drop-down
 $positions = $conn->query("SELECT pos_id, pos_name FROM position");
-$result = $conn->query("
-    SELECT employee_table.*, position.pos_name 
-    FROM employee_table 
-    JOIN position 
-    ON employee_table.emp_position = position.pos_id
-");
+$departments = $conn->query("SELECT dept_id, dept_name FROM department");
+$managers = $conn->query("SELECT user_id, user_full_name FROM user_management");
+
+$result = $conn->query("SELECT employee_table.*, position.pos_name, user_management.user_full_name, department.dept_name FROM employee_table JOIN position ON employee_table.emp_position = position.pos_id JOIN user_management ON employee_table.employ_manager = user_management.user_id JOIN department ON employee_table.employ_dept = department.dept_id");
+?>
+
 ?>
 
 <!DOCTYPE html>
@@ -251,18 +251,41 @@ $result = $conn->query("
 
             <!-- EMPLOY MANAGER -->
             <label for="employ_manager" class="block text-sm font-medium text-gray-700">Manager</label>
-            <input type="text" id="employ_manager" name="employ_manager" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"required>
-            
+            <select name="employ_manager" id="employ_manager"  class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"required>
+            // I WANT TO MAKE THIS INTO SELECTION OF DEPARTMENT NAME
+                <option value="">Select Manager</option>
+                <?php
+                if($managers->num_rows >0){
+                    while($manager = $managers->fetch_assoc()){
+                        echo "<option value='" . $manager['user_id'] . "'>" . $manager['user_full_name'] . "</option>";
+                    }
+                }else {
+                    echo "<option value=''>No Department Available</option>";
+                }
+                
+                ?>
+            </select>
 
             <!-- EMPLOY DEPARTMENT -->
             <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
-            <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"required>
-            
+            <select name="employ_dept" id="employ_dept"  class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"required>
+            // I WANT TO MAKE THIS INTO SELECTION OF DEPARTMENT NAME
+                <option value="">Select Manager</option>
+                <?php
+                if($departments->num_rows >0){
+                    while($department = $departments->fetch_assoc()){
+                        echo "<option value='" . $department['dept_id'] . "'>" . $department['dept_name'] . "</option>";
+                    }
+                }else {
+                    echo "<option value=''>No Department Available</option>";
+                }
+                
+                ?>
+            </select>
 
             <!-- EMP FILE/MOVE UPLOAD, WAG NA SA DATABASE -->
             <label for="emp_file" class="block text-sm font-medium text-gray-700">Upload CV/Resume</label>
             <input type="file" id="emp_file" name="emp_file" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"required>
-
             </form>
             `,
             showCancelButton: true,
@@ -326,8 +349,8 @@ $result = $conn->query("
                     <td><?php echo $row['emp_email'];?></td>
                     <td><?php echo $row['emp_number'];?></td>
                     <td><?php echo $row['emp_zip'];?></td>
-                    <td><?php echo $row['employ_manager'];?></td>
-                    <td><?php echo $row['employ_dept'];?></td>
+                    <td><?php echo $row['user_full_name'];?></td> <!-- i want to display here instead of employ_manger it should be the user_full_name from the user_management table -->
+                    <td><?php echo $row['dept_name'];?></td>
                     <td><?php echo htmlspecialchars($row["emp_status"]); ?></td>
                     <td>
                     <button type="button" class="updateBtn" data-id="<?php echo $row['emp_company_num']; ?>">
