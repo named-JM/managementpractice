@@ -9,6 +9,16 @@ $phoneErrorMessage = "";
 $emailErrorMessage = "";
 $phoneErrorMessage = "";
 
+// Function to generate a random password
+function generatePassword($length = 8) {
+    $characters = '0123456789';
+    $password = '';
+    for ($i = 0; $i < $length; $i++) {
+        $password .= $characters[rand(0, strlen($characters) - 1)];
+    }
+    return $password;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Retrieving data from the form
     $emp_fname = $_POST['emp_fname'];
@@ -28,15 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $checkQuery->store_result();
     $checkQuery->bind_result($dbEmail, $dbPhone);
     $checkQuery->fetch();
-    
 
     if ($checkQuery->num_rows > 0) {
-        // WHERE VALIDATING SEPARETE IF EMAIL ALREADY EXIST OR PHONE ALREADY EXIST TO KNOW WHAT USER IS WHAT THEIR WRONG
-        if ($dbEmail == $emp_email){
-            $emailErrorMessage = "Email already exist!";
+        if ($dbEmail == $emp_email) {
+            $emailErrorMessage = "Email already exists!";
         }
-        if($dbPhone == $emp_number){
-            $phoneErrorMessage = "Phone Number already exist!";
+        if ($dbPhone == $emp_number) {
+            $phoneErrorMessage = "Phone Number already exists!";
         }
     } else {
         // Generate `emp_company_num`
@@ -46,14 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $row = $result->fetch_assoc();
 
         if ($row['max_num']) {
-            // Extract the last number part and increment it
             $last_num = (int)substr($row['max_num'], -9);
             $new_num = str_pad($last_num + 1, 9, '0', STR_PAD_LEFT);
         } else {
-            // Start with 000000001 if no records exist for the year
             $new_num = '000000001';
         }
         $emp_company_num = "EMP-$year-$new_num";
+
+        // Generate password
+        $emp_password = generatePassword();
 
         // Handle file upload
         $uploadsDir = "C:/xampp/htdocs/management/secure_uploads/";
@@ -62,26 +71,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $uploadOk = 1;
         $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-        // Check if file is a valid type (you can add more validation)
         $allowedTypes = array("pdf", "doc", "docx");
         if (!in_array($fileType, $allowedTypes)) {
-            // echo "<br>Sorry, only PDF, DOC, and DOCX files are allowed.";
             $uploadOk = 0;
         }
 
-        // If UPLOADOK IS NOT OKAY (0) THEN MESSAGE NOT UPLOADED
         if ($uploadOk == 0) {
             echo "<br>Sorry, your file was not uploaded.";
         } else {
-            // Try to move the file to the target directory
             if (move_uploaded_file($_FILES["emp_file"]["tmp_name"], $targetFile)) {
                 $successMessage = "The file " . htmlspecialchars($fileName) . " has been uploaded.";
 
                 // After checking uploaded file, inserting data to the database
-                $stmt = $conn->prepare("INSERT INTO employee_table (emp_fname, emp_mname, emp_lname, emp_position, emp_company_num, emp_email, emp_number, emp_zip, employ_manager, employ_dept, emp_status, emp_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?)");
-                $stmt->bind_param("sssissiisss", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_company_num, $emp_email, $emp_number, $emp_zip, $employ_manager, $employ_dept, $fileName);
+                $stmt = $conn->prepare("INSERT INTO employee_table (emp_fname, emp_mname, emp_lname, emp_position, emp_company_num, emp_email, emp_number, emp_zip, employ_manager, employ_dept, emp_status, emp_password, emp_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, ?)");
+                $stmt->bind_param("sssissiissss", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_company_num, $emp_email, $emp_number, $emp_zip, $employ_manager, $employ_dept, $emp_password, $fileName);
                 if ($stmt->execute()) {
-                    $successMessage .= " New record created successfully.";
+                    $successMessage .= " New record created successfully. Password: $emp_password";
                 } else {
                     $errorMessage = "Error: " . $stmt->error;
                 }
@@ -100,10 +105,11 @@ $positions = $conn->query("SELECT pos_id, pos_name FROM position");
 $departments = $conn->query("SELECT dept_id, dept_name FROM department");
 $managers = $conn->query("SELECT user_id, user_full_name FROM user_management");
 
-$result = $conn->query("SELECT employee_table.*, position.pos_name, user_management.user_full_name, department.dept_name FROM employee_table JOIN position ON employee_table.emp_position = position.pos_id JOIN user_management ON employee_table.employ_manager = user_management.user_id JOIN department ON employee_table.employ_dept = department.dept_id");
+$result = $conn->query("
+SELECT employee_table.*, position.pos_name, user_management.user_full_name, department.dept_name FROM employee_table JOIN position ON employee_table.emp_position = position.pos_id JOIN user_management ON employee_table.employ_manager = user_management.user_id JOIN department ON employee_table.employ_dept = department.dept_id");
 ?>
 
-?>
+
 
 <!DOCTYPE html>
 <html lang="en">
