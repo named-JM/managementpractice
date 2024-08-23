@@ -106,7 +106,10 @@ $departments = $conn->query("SELECT dept_id, dept_name FROM department");
 $managers = $conn->query("SELECT user_id, user_full_name FROM user_management");
 
 $result = $conn->query("
-SELECT employee_table.*, position.pos_name, user_management.user_full_name, department.dept_name FROM employee_table JOIN position ON employee_table.emp_position = position.pos_id JOIN user_management ON employee_table.employ_manager = user_management.user_id JOIN department ON employee_table.employ_dept = department.dept_id");
+SELECT employee_table.*, position.pos_name, user_management.user_full_name, department.dept_name FROM employee_table
+JOIN position ON employee_table.emp_position = position.pos_id
+JOIN user_management ON employee_table.employ_manager = user_management.user_id
+JOIN department ON employee_table.employ_dept = department.dept_id");
 ?>
 
 
@@ -203,7 +206,7 @@ SELECT employee_table.*, position.pos_name, user_management.user_full_name, depa
             const btn = document.getElementById("openFormBtn");
             btn.addEventListener("click", rippleEffect);
             
-        // SWEETALERT FORM SCRIPT
+        // SWEETALERT ADDING FORM HERE!!!!!
         document.getElementById('openFormBtn').addEventListener('click', function() {
             Swal.fire({
             title: 'Employment Contract Form',
@@ -407,47 +410,56 @@ SELECT employee_table.*, position.pos_name, user_management.user_full_name, depa
                 data: { emp_company_num: emp_company_num },
                 dataType: 'json',
                 success: function(data) {
-                    // Populate SweetAlert form with fetched data
-                    Swal.fire({
-                        title: 'Update Employee',
-                        html: `
-                            <form id="updateEmployeeForm" class="space-y-4 text-left" action="update_employee.php" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="emp_company_num" value="${data.emp_company_num}">
-                            <label for="emp_fname" class="block text-sm font-medium text-gray-700">First Name</label>
-                            <input type="text" id="emp_fname" name="emp_fname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_fname}" required>
-                            <label for="emp_mname" class="block text-sm font-medium text-gray-700">Middle Name</label>
-                            <input type="text" id="emp_mname" name="emp_mname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_mname}" required>
-                            <label for="emp_lname" class="block text-sm font-medium text-gray-700">Last Name</label>
-                            <input type="text" id="emp_lname" name="emp_lname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_lname}" required>
-                            <label for="emp_position" class="block text-sm font-medium text-gray-700">Position</label>
-                            <select name="emp_position" id="emp_position" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                                <option value="${data.emp_position}">${data.pos_name}</option>
-                                <?php
-                                    $positions->data_seek(0);
-                                    while($position = $positions->fetch_assoc()) {
-                                        echo "<option value='" . $position['pos_id'] . "'>" . $position['pos_name'] . "</option>";
-                                    }
-                                ?>
-                            </select>
-                            <label for="emp_email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" id="emp_email" name="emp_email" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_email}" required>
-                            <label for="emp_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                            <input type="text" id="emp_number" name="emp_number" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_number}" required>
-                            <label for="emp_zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
-                            <input type="text" id="emp_zip" name="emp_zip" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_zip}" required>
-                            <label for="employ_manager" class="block text-sm font-medium text-gray-700">Manager</label>
-                            <input type="text" id="employ_manager" name="employ_manager" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_manager}" required>
-                            <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
-                            <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_dept}" required>
-                            
-                            <select id="emp_status" name="emp_status" class="w-full py-2 mt-1 mb-5 text-left border rounded">
-                        <option value="Active" ${emp_status === 'Active' ? 'selected' : ''}>Active</option>
-                        <option value="AWOL" ${emp_status === 'AWOL' ? 'selected' : ''}>AWOL</option>
-                        <option value="Terminated" ${emp_status === 'Terminated' ? 'selected' : ''}>Terminated </option>
-                    </select>
-                            
-                            </form>
-                        `,
+                        // SWWERT ALERT FORM EDITING/UPDATING HERE!!!!
+                        Swal.fire({
+                            title: 'Update Employee',
+                            html: `
+                                <form id="updateEmployeeForm" class="space-y-4 text-left" action="update_employee.php" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="emp_company_num" value="${data.emp_company_num}">
+                                <label for="emp_fname" class="block text-sm font-medium text-gray-700">First Name</label>
+                                <input type="text" id="emp_fname" name="emp_fname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_fname}" required>
+                                <label for="emp_mname" class="block text-sm font-medium text-gray-700">Middle Name</label>
+                                <input type="text" id="emp_mname" name="emp_mname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_mname}" required>
+                                <label for="emp_lname" class="block text-sm font-medium text-gray-700">Last Name</label>
+                                <input type="text" id="emp_lname" name="emp_lname" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_lname}" required>
+                                <label for="emp_position" class="block text-sm font-medium text-gray-700">Position</label>
+                                <select name="emp_position" id="emp_position" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                                    <option value="${data.emp_position}">${data.pos_name}</option>
+                                    <?php
+                                        $positions->data_seek(0);
+                                        while($position = $positions->fetch_assoc()) {
+                                            echo "<option value='" . $position['pos_id'] . "'>" . $position['pos_name'] . "</option>";
+                                        }
+                                    ?>
+                                </select>
+                                <label for="emp_email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" id="emp_email" name="emp_email" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_email}" required>
+                                <label for="emp_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                <input type="text" id="emp_number" name="emp_number" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_number}" required>
+                                <label for="emp_zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
+                                <input type="text" id="emp_zip" name="emp_zip" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_zip}" required>
+                                <label for="employ_manager" class="block text-sm font-medium text-gray-700">Manager</label>
+                                <select name="emp_position" id="emp_position" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                                    <option value="${data.employ_manager}">${data.employ_manager}</option>
+                                    <?php
+                                        $managers->data_seek(0);
+                                        while($manager = $managers->fetch_assoc()) {
+                                            echo "<option value='" . $manager['user_id'] . "'>" . $manager['user_full_name'] . "</option>";
+                                        }
+                                    ?>
+                                </select>
+                                <input type="text" id="employ_manager" name="employ_manager" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_manager}" required>
+                                <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
+                                <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_dept}" required>
+                                
+                                <select id="emp_status" name="emp_status" class="w-full py-2 mt-1 mb-5 text-left border rounded">
+                            <option value="Active" ${emp_status === 'Active' ? 'selected' : ''}>Active</option>
+                            <option value="AWOL" ${emp_status === 'AWOL' ? 'selected' : ''}>AWOL</option>
+                            <option value="Terminated" ${emp_status === 'Terminated' ? 'selected' : ''}>Terminated </option>
+                        </select>
+                                
+                                </form>
+                            `,
                         showCancelButton: true,
                         cancelButtonColor: "#d33",
                         confirmButtonText: 'Update',
