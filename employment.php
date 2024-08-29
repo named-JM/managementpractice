@@ -54,6 +54,7 @@ $result = $conn->query("SELECT * FROM employment");
     <script src="sweetalert2.min.js"></script>
     <link rel="stylesheet" href="sweetalert2.min.css">
 </head>
+<!-- CSS STYLE FOR SWEET ALERT FORM FIELD -->
 <style>
     .swal2-popup {
             width: 500px !important;
@@ -100,30 +101,32 @@ $result = $conn->query("SELECT * FROM employment");
     </button>
 
     <script>
-        function rippleEffect(event) {
-                const btn = event.currentTarget;
+        
+        // OLD ADD BUTTON RIPPLE EFFECT
+        // function rippleEffect(event) {
+        //         const btn = event.currentTarget;
 
-                const circle = document.createElement("span");
-                const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-                const radius = diameter / 2;
+        //         const circle = document.createElement("span");
+        //         const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+        //         const radius = diameter / 2;
 
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
-                circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
-                circle.classList.add("ripple");
+        //         circle.style.width = circle.style.height = `${diameter}px`;
+        //         circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
+        //         circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
+        //         circle.classList.add("ripple");
 
-                const ripple = btn.getElementsByClassName("ripple")[0];
+        //         const ripple = btn.getElementsByClassName("ripple")[0];
 
-                if (ripple) {
-                    ripple.remove();
-                }
-                btn.appendChild(circle);
-            }
-            const btn = document.getElementById("openFormBtn");
-            btn.addEventListener("click", rippleEffect);
+        //         if (ripple) {
+        //             ripple.remove();
+        //         }
+        //         btn.appendChild(circle);
+        //     }
+        //     const btn = document.getElementById("openFormBtn");
+        //     btn.addEventListener("click", rippleEffect);
 
             
-        // SWEETALERT FORM SCRIPT
+        // SWEETALERT ADDING EMPLOYMENT FORM SCRIPT
         document.getElementById('openFormBtn').addEventListener('click', function() {
             Swal.fire({
             title: 'Employment Contract Form',
@@ -165,7 +168,7 @@ $result = $conn->query("SELECT * FROM employment");
             confirmButtonText: 'Submit',
             width: '400px',
             customClass: {
-                popup: 'swal-wide', // Additional custom class if needed
+                popup: 'swal-wide',
             },
             preConfirm: () => {
             // const contractual_name = document.getElementById('contractual_name').value;
@@ -173,7 +176,7 @@ $result = $conn->query("SELECT * FROM employment");
             const terms = document.getElementById('terms').value;
             const duration = document.getElementById('duration').value;
 
-            // Perform validation
+            // VALIDATION WHEN USER IS NOT THERES NO FILLED OUT FIELDS
             if (!compensation || !terms || !duration) {
                 Swal.showValidationMessage('Please fill out all required fields.');
                 return false;

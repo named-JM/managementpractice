@@ -9,8 +9,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_benefit'])) {
         $stmt = $conn->prepare("INSERT INTO benefits (ben_name, ben_status) VALUES (?, 'active')");
         $stmt->bind_param("s", $ben_name);
 
+        // REDIRECT TO PREVENT RESUBMISSIONDN
         if ($stmt->execute()) {
-            header("Location: benefits.php"); // Redirect to prevent resubmission
+            header("Location: benefits.php");
             exit();
         } else {
             echo "Error: " . $stmt->error;
@@ -27,10 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_benefit'])) {
     }
 }
 
-// Fetch benefits
+// FETCHING BENEFITS FOR THE TABLE HERE.S!
 $sql = "SELECT * FROM benefits";
 $result = $conn->query($sql);
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,7 +61,7 @@ $result = $conn->query($sql);
         $(document).ready(function () {
             $('#benefits_table').DataTable();
 
-            // Update status on change
+            // THIS IS TO UPDATE STATUS!
             $('select[name="ben_status"]').on('change', function () {
                 var ben_id = $(this).data('ben-id');
                 var ben_status = $(this).val();
@@ -124,7 +127,7 @@ $result = $conn->query($sql);
         function capitalizeFirstLetter(input) {
             return input.charAt(0).toUpperCase() + input.slice(1);
         }
-        // BUTTON CLICK EFFECT
+        //OLD BUTTON CLICK EFFECT
         function rippleEffect(event) {
             const btn = event.currentTarget;
 
@@ -147,7 +150,7 @@ $result = $conn->query($sql);
         const btn = document.getElementById("openFormBtn");
         btn.addEventListener("click", rippleEffect);
             
-        // SWEETALERT FORM SCRIPT
+        // ADDING BENEFITS SWEETALERT FORM SCRIPT HERE!!!
         document.getElementById('openFormBtn').addEventListener('click', function() {
             Swal.fire({
                 title: 'Benefits Form',
@@ -189,6 +192,7 @@ $result = $conn->query($sql);
         });
     </script>
     
+    <!-- BENEFIT TABLE DISPLAY HERE!! -->
 
     <table border="1" id="benefits_table" class="w-full bg-white rounded-lg shadow-lg display">
         <thead>

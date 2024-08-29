@@ -5,21 +5,38 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// GET THE BEN_ID FROM THE BENEFITS PAGE AFTER CLICKING THE VIEW
+// FOR EXAMPLE CLICKING VIEW TO THE COLUMN OF SSS AND WILL GET THE BEN_ID OF IT 
+// TO PROCEED TO ANOTHER PAGE TO MODIFY WITH THAT VALIE
 $ben_id = $_GET['ben_id'] ?? '';
 $ben_name = '';
 
 // CHECKING FOR OVERLAPPING IN THE DATA TABLE RANGES!!!
+// THIS IS TO CHECK AND ENSURES THR START OR END OF THE NEW RANGE WILL OVERLAP
+// WITHIN THE EXISTING RANGE OR THE EXISITNG RANGE STARTS WITHIN NEW RANGE
 function isRangeOverlap($conn, $ben_id, $start, $end, $current_id = null) {
     $query = "SELECT * FROM benefits_lists WHERE ben_id = ? AND ((ben_list_range_s <= ? AND ben_list_range_e >= ?) OR (ben_list_range_s >= ? AND ben_list_range_s <= ?))";
+    
+    // THIS IS WHERE TO CONDITION IN EDITING. IF CLICKING THE RANGE TO EDIT IT WILL PROVIDED AN CURRENT OF ITS ID
+    // THEN IT WILL EXCLUDE THAT BENEFIT RANGE TO THE CHECKING 
     if ($current_id !== null) {
         $query .= " AND ben_list_id != ?";
     }
     
     $stmt = $conn->prepare($query);
-    
+    // THIS IS WHERE IF USER EDIT THE RANGES IT WILL EXLCUDE THE ITS CURRENT ID FROM THE COMPARING CHECKING
     if ($current_id !== null) {
+        // THE FIRST $END AND $START CHINCHECK YUNG BAGONG RANGE IF IT OVERLAPS SA EXISTING RANGES PALABAS OR PALOOB 
+        // EX:  EXISTING RANGE IS 10-20 AND U GONNA ADD 15-25 RANGE. 
+        //  so ben_list_range_s (current exisiting range start) <= $end which is 10 <=25 TRUE
+        //  and then ben list range e (current range end) <= $start which is 10<=15 TRUE
+        // THE LAST $START AND $END CHINICHECK NYA IF UNG EXISITNG RANGE E NAGSTARTS WITHIN THE NEW RANGES
+        // so ben_list_range_s (current exisiting range start) >= $start which is 10 >= 15  FALSE (tho nagfalse sya nacheck nya parin ung iba na overlaps pa din)
+        // so ben list range s (current exisitng range start) <= $enf which 10<25 TRUE
         $stmt->bind_param("iddddi", $ben_id, $end, $start, $start, $end, $current_id);
-    } else {
+    }
+    // ELSE IT WILL PROCEED TO CHECK OVERALL
+    else {
         $stmt->bind_param("idddd", $ben_id, $end, $start, $start, $end);
     }
     
@@ -30,8 +47,7 @@ function isRangeOverlap($conn, $ben_id, $start, $end, $current_id = null) {
 }
 
 
-
-// Handle the update request
+// THIS HERE HANDLES THE UPDATE REQUEST !
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $id = $_POST['edit_id'] ?? '';
     $ben_list_range_s = $_POST['ben_list_range_s'] ?? '';
@@ -39,17 +55,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $ben_employee_amount = $_POST['ben_employee_amount'] ?? '';
     $ben_employer_amount = $_POST['ben_employer_amount'] ?? '';
 
+    // CHECKING IF THE USER FILLED OUT THE FIELDS
     if (!empty($id) && !empty($ben_list_range_s) && !empty($ben_list_range_e) && !empty($ben_employee_amount) && !empty($ben_employer_amount)) {
-        // Exclude the current record from the overlap check
+        // THIS IS ANOTHER CONDITION THAT IT SHOULD NOT PROCEED IF START IS GREATER THAN THE END
         if ($ben_list_range_s > $ben_list_range_e) {
             echo json_encode(['error' => 'The start range cannot be greater than the end range.']);
             exit;
         }
+        // THIS IS CONDITION OF EDITING A CURRENT RANGE WHERE THE CHECKING OF OEVRLAP WITH ANY EXISITN GRANGES EXCLUSING THE CURRENT RANGE
         if (isRangeOverlap($conn, $ben_id, $ben_list_range_s, $ben_list_range_e, $id)) {
             echo json_encode(['overlap' => true]);
             exit;
         } else {
-            // Update the existing benefits list entry
             $stmt = $conn->prepare("UPDATE benefits_lists SET ben_list_range_s = ?, ben_list_range_e = ?, ben_employee_amount = ?, ben_employer_amount = ? WHERE ben_list_id = ?");
             $stmt->bind_param("ddddi", $ben_list_range_s, $ben_list_range_e, $ben_employee_amount, $ben_employer_amount, $id);
 
@@ -173,6 +190,7 @@ if (!empty($ben_id)) {
         $(document).ready(function () {
             $('#benefits_table').DataTable();
 
+            // OLD BUTTON EFFECT
             function rippleEffect(event) {
                 const btn = event.currentTarget;
                 const circle = document.createElement("span");
@@ -194,7 +212,7 @@ if (!empty($ben_id)) {
             const btn = document.getElementById("openFormBtn");
             btn.addEventListener("click", rippleEffect);
             
-            // Adding Ranges Modal Form SweetAlert
+            // THIS IS WHERE ADDING RANGES SWEETALERT FORM 
             $('#openFormBtn').on('click', function () {
                 Swal.fire({
                     title: 'Benefits Form',
@@ -254,7 +272,7 @@ if (!empty($ben_id)) {
                 });
             });
 
-            // Edit entry modal using SweetAlert2
+            // THIS IS WHERE EDIT SWEETALERT FORM!!!
             $('.editBtn').on('click', function () {
                 const row = $(this).closest('tr');
                 const id = row.find('.ben-list-id').text();
@@ -373,6 +391,7 @@ if (!empty($ben_id)) {
         <button id="openFormBtn" class="px-4 py-2 text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Add Benefits Range</button>
     </div>
 
+    <!-- HERE I THE BENEFIT RANGE TABLE DISPLAY! -->
     <table id="benefits_table" class="min-w-full bg-white border border-gray-200 rounded-md">
         <thead>
             <tr>
