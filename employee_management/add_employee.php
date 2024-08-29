@@ -101,9 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Get fetching the position data table in the database to display the drop-down
-$positions = $conn->query("SELECT pos_id, pos_name FROM position");
-$departments = $conn->query("SELECT dept_id, dept_name FROM department");
-$managers = $conn->query("SELECT user_id, user_full_name FROM user_management");
+$positions = $conn->query("SELECT pos_id, pos_name FROM position ");
+$departments = $conn->query("SELECT dept_id, dept_name FROM department WHERE is_deleted=0");
+$managers = $conn->query("SELECT user_id, user_full_name FROM user_management WHERE is_deleted=0");
 
 $result = $conn->query("
 SELECT employee_table.*, position.pos_name, user_management.user_full_name, department.dept_name FROM employee_table
@@ -439,8 +439,8 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                                 <label for="emp_zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
                                 <input type="text" id="emp_zip" name="emp_zip" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.emp_zip}" required>
                                 <label for="employ_manager" class="block text-sm font-medium text-gray-700">Manager</label>
-                                <select name="emp_position" id="emp_position" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                                    <option value="${data.employ_manager}">${data.employ_manager}</option>
+                                <select name="employ_manager" id="employ_manager" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                                    <option value="${data.employ_manager}">${data.manager_name}</option>
                                     <?php
                                         $managers->data_seek(0);
                                         while($manager = $managers->fetch_assoc()) {
@@ -448,7 +448,6 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                                         }
                                     ?>
                                 </select>
-                                <input type="text" id="employ_manager" name="employ_manager" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_manager}" required>
                                 <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
                                 <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_dept}" required>
                                 

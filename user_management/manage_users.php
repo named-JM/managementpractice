@@ -3,6 +3,26 @@ include "../db_connection.php";
 
 $successMessage = $errorMessage = '';
 
+// Handle soft delete request
+if (isset($_GET['delete_id'])) {
+    $user_id = $_GET['delete_id'];
+
+    // Prepare the statement to update the is_deleted column
+    $stmt = $conn->prepare("UPDATE user_management SET is_deleted = 1 WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+
+    if ($stmt->execute()) {
+        $successMessage = "User deleted successfully.";
+        // Redirect after successful deletion to avoid resubmission on refresh
+        header("Location: manage_users.php?success=2");
+        exit();
+    } else {
+        $errorMessage = "Error: " . $stmt->error;
+    }
+    $stmt->close();
+}
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_full_name = $_POST['user_full_name'] ?? '';
     $user_email = $_POST['user_email'] ?? '';
@@ -28,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Fetch to display table
-$result = $conn->query("SELECT * FROM user_management");
+$result = $conn->query("SELECT * FROM user_management WHERE is_deleted = 0");
 ?>
 
 <!DOCTYPE html>
@@ -72,6 +92,7 @@ $result = $conn->query("SELECT * FROM user_management");
                 <td>Email</td>
                 <td>Contact Number</td>
                 <td>Role</td>
+                <td>Action</td>
             </tr>
         </thead>
     
@@ -82,6 +103,9 @@ $result = $conn->query("SELECT * FROM user_management");
             <td><?php echo $row['user_email'];?></td>
             <td><?php echo $row['user_contacts'];?></td>
             <td><?php echo $row['user_role'];?></td>
+            <td>
+            <a href="manage_users.php?delete_id=<?php echo $row['user_id']; ?>" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+            </td>
         </tr>
 
         <?php endwhile; ?>

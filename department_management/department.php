@@ -1,15 +1,35 @@
 <?php
-
 include "../db_connection.php";
 
+$successMessage = $errorMessage = '';
 
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
+// Handle soft delete request
+if (isset($_GET['delete_id'])) {
+    $dept_id = $_GET['delete_id'];
+
+    // Prepare the statement to update the is_deleted column
+    $stmt = $conn->prepare("UPDATE department SET is_deleted = 1 WHERE dept_id = ?");
+    $stmt->bind_param("i", $dept_id);
+
+    if ($stmt->execute()) {
+        $successMessage = "Department deleted successfully.";
+        // Redirect after successful deletion to avoid resubmission on refresh
+        header("Location: department.php?success=2");
+        exit();
+    } else {
+        $errorMessage = "Error: " . $stmt->error;
+    }
+    $stmt->close();
+}
+
+// Handle department addition
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dept_name = $_POST['dept_name'] ?? '';
-    $dept_code= $_POST['dept_code'] ?? '';
+    $dept_code = $_POST['dept_code'] ?? '';
     $dept_head = $_POST['dept_head'] ?? '';
 
     if (!empty($dept_name) && !empty($dept_code) && !empty($dept_head)) {
-        $stmt = $conn->prepare("INSERT INTO department (dept_name, dept_code, dept_head) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO department (dept_name, dept_code, dept_head, is_deleted) VALUES (?, ?, ?, 0)");
         $stmt->bind_param("sss", $dept_name, $dept_code, $dept_head);
 
         if ($stmt->execute()) {
@@ -26,16 +46,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// FETCHING DEPARTMENT TO DOSPPALY TABLE AND TO DISPLA THE USER FULL NAME
-$result = $conn->query("SELECT department.dept_name, department.dept_code, user_management.user_full_name 
+// Fetch departments to display table, excluding deleted departments
+$result = $conn->query("SELECT department.dept_id, department.dept_name, department.dept_code, user_management.user_full_name 
                         FROM department
-                        JOIN user_management ON department.dept_head = user_management.user_id");
-// FETCHING THE USER ID ROLE FOR DISPLAYING USER ROLES IN DEPARTMENET SELECTION
-$roles = $conn->query("SELECT user_id, user_full_name FROM user_management");
+                        JOIN user_management ON department.dept_head = user_management.user_id
+                        WHERE department.is_deleted = 0");
+
+// Fetch user IDs and names for department head selection
+$roles = $conn->query("SELECT user_id, user_full_name FROM user_management WHERE is_deleted = 0");
 
 $deptHeadRolesOptions = "";
 if ($roles->num_rows > 0) {
-    while ($role= $roles->fetch_assoc()) {
+    while ($role = $roles->fetch_assoc()) {
         $deptHeadRolesOptions .= "<option value='" . $role['user_id'] . "'>" . $role['user_full_name'] . "</option>";
     }
 }
@@ -47,17 +69,16 @@ if ($roles->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Department Management</title>
-    <!-- TAILWING CDN -->
+    <!-- TAILWIND CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- tialiwind css file -->
+    <!-- Tailwind CSS file -->
     <link href="./output.css" rel="stylesheet">
-    <!-- datatable style cdn -->
+    <!-- DataTables style CDN -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.min.css">
-    <!-- font awesome icons -->
+    <!-- Font Awesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- SWEETALERT2 CDN -->
+    <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables JS CDN -->
@@ -67,7 +88,7 @@ if ($roles->num_rows > 0) {
     $(document).ready(function () {
         $('#department_table').DataTable();
 
-        // MODAL FORM SWEETALERT!!!!
+        // Modal form SweetAlert
         $('#openFormBtn').on('click', function () {
             Swal.fire({
                 title: 'Department Form',
@@ -105,32 +126,29 @@ if ($roles->num_rows > 0) {
             });
         });
     });
-</script>
-
-
+    </script>
 </head>
 <style>
     .swal2-popup {
-            width: 500px !important;
-            padding: 20px !important;
-            text-align: left;
-        }
-        .swal2-content {
-            text-align: left !important;
-        }
-        .swal2-input {
-            width: 100% !important;
-            margin-bottom: 15px;
-        }
-        .swal2-select {
-            width: 100% !important;
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 10px;
-        }
-        
+        width: 500px !important;
+        padding: 20px !important;
+        text-align: left;
+    }
+    .swal2-content {
+        text-align: left !important;
+    }
+    .swal2-input {
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+    .swal2-select {
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+    label {
+        display: block;
+        margin-bottom: 10px;
+    }
 </style>
 <body class="p-20 m-2 bg-gray-100">
     <button type="button" id="openFormBtn"
@@ -138,27 +156,28 @@ if ($roles->num_rows > 0) {
         Add Department
     </button>
 
-
     <table border="1" id="department_table" class="w-full bg-white rounded-lg shadow-lg display">
         <thead>
             <tr>
                 <td>Department Name</td>
                 <td>Department Code</td>
                 <td>Department Head</td>
+                <td>Action</td>
             </tr>
         </thead>
     
-    <tbody>
-    <?php while($row = $result->fetch_assoc()): ?>
-        <tr>
-            <td><?php echo $row['dept_name'];?></td>
-            <td><?php echo $row['dept_code'];?></td>
-            <td><?php echo $row['user_full_name'];?></td>
-        </tr>
-
+        <tbody>
+        <?php while ($row = $result->fetch_assoc()): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($row['dept_name']); ?></td>
+                <td><?php echo htmlspecialchars($row['dept_code']); ?></td>
+                <td><?php echo htmlspecialchars($row['user_full_name']); ?></td>
+                <td>
+                    <a href="department.php?delete_id=<?php echo $row['dept_id']; ?>" onclick="return confirm('Are you sure you want to delete this department?');" class="text-red-500">Delete</a>
+                </td>
+            </tr>
         <?php endwhile; ?>
-    </tbody>
+        </tbody>
     </table>
-
 </body>
 </html>
