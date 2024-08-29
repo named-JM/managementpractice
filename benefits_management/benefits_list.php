@@ -137,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['check_overlap'])) {
         }
     } else {
         // echo "All fields are required.";
-    }   
+    } 
 }
 
 // Fetch benefits list for specific ben_id
