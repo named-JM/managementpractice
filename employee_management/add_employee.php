@@ -448,7 +448,6 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                                     ?>
                                 </select>
                                 <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
-                                <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
                                 <select name="employ_dept" id="employ_dept" class="block text-sm font-medium text-gray-700">
                                         <option"${data.employ_dept}">${data.dept_name}</option>
                                         <?php
