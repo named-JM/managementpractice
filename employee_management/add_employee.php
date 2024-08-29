@@ -278,7 +278,6 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
             <!-- EMPLOY DEPARTMENT -->
             <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
             <select name="employ_dept" id="employ_dept"  class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"required>
-            // I WANT TO MAKE THIS INTO SELECTION OF DEPARTMENT NAME
                 <option value="">Select Manager</option>
                 <?php
                 if($departments->num_rows >0){
@@ -449,8 +448,16 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                                     ?>
                                 </select>
                                 <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
-                                <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" value="${data.employ_dept}" required>
-                                
+                                <input type="text" id="employ_dept" name="employ_dept" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                                <select name="employ_dept" id="employ_dept" class="block text-sm font-medium text-gray-700">
+                                        <option"${data.employ_dept}">${data.dept_name}</option>
+                                        <?php
+                                            $departments->data_seek(0);
+                                            while($department = $departments->fetch_assoc()) {
+                                                echo "<option value='" . $department['dept_id'] . "'>" . $department['dept_name'] . "</option>";
+                                            }
+                                        ?>
+                                </select>
                                 <select id="emp_status" name="emp_status" class="w-full py-2 mt-1 mb-5 text-left border rounded">
                             <option value="Active" ${emp_status === 'Active' ? 'selected' : ''}>Active</option>
                             <option value="AWOL" ${emp_status === 'AWOL' ? 'selected' : ''}>AWOL</option>
