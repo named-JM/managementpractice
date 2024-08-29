@@ -6,10 +6,11 @@ if (isset($_POST['emp_company_num'])) {
     $emp_company_num = $_POST['emp_company_num'];
 
     $stmt = $conn->prepare("
-    SELECT e.*, p.pos_name, um.user_full_name as manager_name
+    SELECT e.*, p.pos_name, um.user_full_name as manager_name, d.dept_name as department_name
         FROM employee_table e
         LEFT JOIN position p ON e.emp_position = p.pos_id
         LEFT JOIN user_management um ON e.employ_manager = um.user_id
+        LEFT JOIN department d ON e.employ_dept = d.dept_id
         WHERE e.emp_company_num = ?
     ");
     $stmt->bind_param("s", $emp_company_num);

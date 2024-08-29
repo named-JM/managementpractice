@@ -449,7 +449,7 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                                 </select>
                                 <label for="employ_dept" class="block text-sm font-medium text-gray-700">Department</label>
                                 <select name="employ_dept" id="employ_dept" class="block text-sm font-medium text-gray-700">
-                                        <option"${data.employ_dept}">${data.dept_name}</option>
+                                        <option"${data.employ_dept}">${data.department_name}</option>
                                         <?php
                                             $departments->data_seek(0);
                                             while($department = $departments->fetch_assoc()) {
