@@ -23,10 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $benefits = $_POST['pos_ref'] ?? [];
 
         // Insert each benefit into the position_benefits table
-        $stmt = $conn->prepare("INSERT INTO position_benefits (pos_ref, ben_id, pos_date) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO position_benefits (pos_ref, ben_id) VALUES (?, ?)");
         foreach ($benefits as $ben_id) {
             if (!empty($ben_id)) { 
-                $stmt->bind_param("iis", $pos_id, $ben_id, $pos_date);
+                $stmt->bind_param("ii", $pos_id, $ben_id);
                 $stmt->execute();
             }
         }

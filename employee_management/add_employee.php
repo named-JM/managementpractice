@@ -184,27 +184,6 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
         function capitalizeFirstLetter(input) {
         return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
     }
-        function rippleEffect(event) {
-                const btn = event.currentTarget;
-
-                const circle = document.createElement("span");
-                const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-                const radius = diameter / 2;
-
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${event.clientX - (btn.offsetLeft + radius)}px`;
-                circle.style.top = `${event.clientY - (btn.offsetTop + radius)}px`;
-                circle.classList.add("ripple");
-
-                const ripple = btn.getElementsByClassName("ripple")[0];
-
-                if (ripple) {
-                    ripple.remove();
-                }
-                btn.appendChild(circle);
-            }
-            const btn = document.getElementById("openFormBtn");
-            btn.addEventListener("click", rippleEffect);
             
         // SWEETALERT ADDING FORM HERE!!!!!
         document.getElementById('openFormBtn').addEventListener('click', function() {
@@ -305,8 +284,8 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                 },
                 preConfirm: () => {
 
-                    // CALL FUNCTION TO capitalizeFirstLetter WHEN SUBMITTING
-                    let emp_fname = capitalizeFirstLetter(document.getElementById('emp_fname').value);
+                // CALL FUNCTION TO capitalizeFirstLetter WHEN SUBMITTING
+                let emp_fname = capitalizeFirstLetter(document.getElementById('emp_fname').value);
                 let emp_mname = capitalizeFirstLetter(document.getElementById('emp_mname').value);
                 let emp_lname = capitalizeFirstLetter(document.getElementById('emp_lname').value);
                 let employ_manager = capitalizeFirstLetter(document.getElementById('employ_manager').value);
