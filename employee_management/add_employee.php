@@ -231,7 +231,18 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
             <label for="emp_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
             <input type="text" id="emp_number" name="emp_number" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"required>
             <span style="color:red;"><?php echo $phoneErrorMessage; ?></span>
-            
+
+            <!-- EMP ADDRESS -->
+            <label for="emp_address" class="block text-sm font-medium text-gray-700">Address</label>
+            <input type="text" id="emp_address" name="emp_address"class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+
+            <!-- EMP CONTRACT -->
+            <label for="emp_contract" class="block text-sm font-medium text-gray-700">Contract</label>
+            <input type="text" id="emp_contract" name="emp_contract" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+
+            <!-- EMP Date Hired -->
+            <label for="emp_date_hired" class="block text-sm font-medium text-gray-700">Date Hired</label>
+            <input type="text" id="emp_date_hired" name="emp_date_hired" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
 
             <!-- EMP ZIP CODE PLACE -->
             <label for="emp_zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
