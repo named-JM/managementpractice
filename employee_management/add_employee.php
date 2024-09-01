@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $employ_manager = $_POST['employ_manager'];
     $employ_dept = $_POST['employ_dept'];
     $emp_address = $_POST['emp_address'];
-    $emp_contract = $_POST['emp_contract'];
+    $emp_payment_freq = $_POST['emp_payment_freq'];
     $emp_date_hired = $_POST['emp_date_hired'];
 
     // Check if email or phone number already exists
@@ -88,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // After checking uploaded file, inserting data to the database
                 $stmt = $conn->prepare("INSERT INTO employee_table (emp_fname, emp_mname, emp_lname, emp_position,
                 emp_company_num, emp_email, emp_number, emp_zip, employ_manager, employ_dept, emp_status, emp_password, emp_file,
-                emp_address, emp_contract, emp_date_hired)
+                emp_address, emp_payment_freq, emp_date_hired)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, ?, ?, ?,?)");
                 $stmt->bind_param("sssissiisssssss", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_company_num, $emp_email, $emp_number, $emp_zip, 
-                $employ_manager, $employ_dept, $emp_password, $fileName, $emp_address, $emp_contract, $emp_date_hired);
+                $employ_manager, $employ_dept, $emp_password, $fileName, $emp_address, $emp_payment_freq, $emp_date_hired);
                 if ($stmt->execute()) {
                     $successMessage .= " New record created successfully. Password: $emp_password";
                 } else {
@@ -243,9 +243,16 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
             <label for="emp_address" class="block text-sm font-medium text-gray-700">Address</label>
             <input type="text" id="emp_address" name="emp_address"class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
 
-            <!-- EMP CONTRACT -->
-            <label for="emp_contract" class="block text-sm font-medium text-gray-700">Contract</label>
-            <input type="text" id="emp_contract" name="emp_contract" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+            <!-- EMP PAYMENT FRQUENCIES! -->
+            <label for="emp_payment_freq" class="block text-sm font-medium text-gray-700">Payment Frequencies</label>
+            <select id="emp_payment_freq" name="emp_payment_freq" class="w-full p-2 text-sm border rounded-md">
+                <option value="">Select Payment Frequencies</option>
+                <option value="Daily Paid">Daily Paid</option>
+                <option value="Monthly Paid">Monthly Paid</option>
+                <option value="Bi-Weekly Paid">Bi-Weekly Paid</option>
+                <option value="Weekly Paid">Weekly Paid</option>
+                <option value="Semi-Monthly Paid">Semi-Monthly Paid</option>
+            </select>
 
             <!-- EMP Date Hired -->
             <label for="emp_date_hired" class="block text-sm font-medium text-gray-700">Date Hired</label>
@@ -334,6 +341,9 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                 <th>Position</th>
                 <th>Email</th>
                 <th>Number</th>
+                <th>Address</th>
+                <th>Payment</th>
+                <th>Date Hired</th>
                 <th>Zip Code</th>
                 <th>Manager</th>
                 <th>Department</th>
@@ -353,6 +363,9 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                     <td><?php echo $row['pos_name']; ?></td> <!-- Displaying pos_name instead of emp_position -->
                     <td><?php echo $row['emp_email'];?></td>
                     <td><?php echo $row['emp_number'];?></td>
+                    <td><?php echo $row['emp_address'] ?></td>
+                    <td><?php echo $row['emp_payment_freq'] ?></td>
+                    <td><?php echo $row['emp_date_hired'] ?></td>
                     <td><?php echo $row['emp_zip'];?></td>
                     <td><?php echo $row['user_full_name'];?></td> <!-- i want to display here instead of employ_manger it should be the user_full_name from the user_management table -->
                     <td><?php echo $row['dept_name'];?></td>
