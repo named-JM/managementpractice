@@ -30,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $emp_zip = $_POST['emp_zip'];
     $employ_manager = $_POST['employ_manager'];
     $employ_dept = $_POST['employ_dept'];
+    $emp_address = $_POST['emp_address'];
+    $emp_contract = $_POST['emp_contract'];
+    $emp_date_hired = $_POST['emp_date_hired'];
 
     // Check if email or phone number already exists
     $checkQuery = $conn->prepare("SELECT emp_email, emp_number FROM employee_table WHERE emp_email = ? OR emp_number = ?");
@@ -83,8 +86,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $successMessage = "The file " . htmlspecialchars($fileName) . " has been uploaded.";
 
                 // After checking uploaded file, inserting data to the database
-                $stmt = $conn->prepare("INSERT INTO employee_table (emp_fname, emp_mname, emp_lname, emp_position, emp_company_num, emp_email, emp_number, emp_zip, employ_manager, employ_dept, emp_status, emp_password, emp_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, ?)");
-                $stmt->bind_param("sssissiissss", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_company_num, $emp_email, $emp_number, $emp_zip, $employ_manager, $employ_dept, $emp_password, $fileName);
+                $stmt = $conn->prepare("INSERT INTO employee_table (emp_fname, emp_mname, emp_lname, emp_position,
+                emp_company_num, emp_email, emp_number, emp_zip, employ_manager, employ_dept, emp_status, emp_password, emp_file,
+                emp_address, emp_contract, emp_date_hired)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, ?, ?, ?,?)");
+                $stmt->bind_param("sssissiisssssss", $emp_fname, $emp_mname, $emp_lname, $emp_position, $emp_company_num, $emp_email, $emp_number, $emp_zip, 
+                $employ_manager, $employ_dept, $emp_password, $fileName, $emp_address, $emp_contract, $emp_date_hired);
                 if ($stmt->execute()) {
                     $successMessage .= " New record created successfully. Password: $emp_password";
                 } else {
@@ -242,7 +249,7 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
 
             <!-- EMP Date Hired -->
             <label for="emp_date_hired" class="block text-sm font-medium text-gray-700">Date Hired</label>
-            <input type="text" id="emp_date_hired" name="emp_date_hired" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+            <input type="date" id="emp_date_hired" name="emp_date_hired" class="block w-full p-2 mt-1 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
 
             <!-- EMP ZIP CODE PLACE -->
             <label for="emp_zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
