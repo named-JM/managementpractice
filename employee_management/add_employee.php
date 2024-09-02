@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $positions = $conn->query("SELECT pos_id, pos_name FROM position ");
 $departments = $conn->query("SELECT dept_id, dept_name FROM department WHERE is_deleted=0");
 $managers = $conn->query("SELECT user_id, user_full_name FROM user_management WHERE is_deleted=0");
-
+$pos_benefits = $conn->query("SELECT * FROM position_benefits");
 $result = $conn->query("
 SELECT employee_table.*, position.pos_name, user_management.user_full_name, department.dept_name FROM employee_table
 JOIN position ON employee_table.emp_position = position.pos_id
@@ -227,6 +227,8 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                 }
                 ?>
             </select>
+
+            
             
             <!-- EMP EMAIL -->
             <label for="emp_email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -388,6 +390,8 @@ JOIN department ON employee_table.employ_dept = department.dept_id");
                 <?php endwhile; ?>
         </tbody>
     </table>
+
+
     <br>
     <?php
     if ($successMessage) {
